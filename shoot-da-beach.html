@@ -6,6 +6,7 @@
   <meta http-equiv='X-UA-Compatible' content='ie=edge' />
   <title>Document</title>
   <script src="bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script>
+  <script src="strategy_box.js" charset="utf-8"></script>
 </head>
 <body>
   <canvas id="mainCanvas" width="800" height="600"></canvas>
@@ -35,6 +36,8 @@
         usedBulletsCount++;
         target.react(bullet);
       });
+
+      target.init();
 
       setInterval(function(){
         draw();
@@ -83,17 +86,50 @@
       minSpeed:0,
       speed:5,
       direction:"right",
+      knowledge:{},
+      init:function(){
+        this.strategyBox = new StrategyBox();
+        // this.strategyBox.debug = true;
+        this.strategyBox.addStrategy("changeDirection", 1)
+        .addStrategy("increaseSpeed", 1)
+        .addStrategy("decreaseSpeed", 1)
+        .addStrategy("nothingToDo", 1);
+      },
       react:function(bullet){
-        var randomNum = Math.random();
+        var strategy = this.strategyBox.decide();
 
-        if(randomNum <= 0.25){
-          this.changeDirection();
-        }else if(randomNum > 0.25 && randomNum <= 0.5){
-          this.increaseSpeed();
-        }else if(randomNum >0.5 && randomNum <=0.75){
-          this.decreaseSpeed();
-        }else{
-          //doNothing
+        if(this[strategy.name]&&"function"==typeof(this[strategy.name]))
+          this[strategy.name]();
+
+        var area = Math.round(bullet.pos.x/10);
+
+        if(!this.knowledge[area]){
+          // console.log("I don't know this situation. And I used '" + strategy.name + "' to react it.");
+          this.knowledge[area] = {
+            strategy:strategy.name,
+            result:false
+          }
+        }
+      },
+      getHit:function(bullet){
+        // console.log("I got hit!");
+        var area = Math.round(bullet.pos.x/this.width);
+
+        if(this.knowledge[area]){
+          this.knowledge[area].result = true;
+          this.strategyBox.changeWeight(this.knowledge[area].strategy,-1);
+        }
+      },
+      dodgedBullet:function(bullet,callback){
+        // console.log("I made it!");
+        var area = Math.round(bullet.pos.x/this.width);
+
+        if(this.knowledge[area]){
+          this.knowledge[area].result = true;
+          this.strategyBox.changeWeight(this.knowledge[area].strategy,+0.25);
+
+          if(callback&&"function"==typeof(callback))
+            callback();
         }
       },
       changeDirection:function(){
@@ -172,8 +208,12 @@
           };
         },
         draw:function(){
-          if(this.pos.y<0)
-            this.destroy();
+          if(this.pos.y<0){
+            var _this = this;
+            target.dodgedBullet(this,function(){
+              _this.destroy();
+            });
+          }
 
           if(this.isBlast){
             context.beginPath();
@@ -232,7 +272,7 @@
               if(!this.isBlast){
                 score++;
                 this.hit = true;
-                target.react(this);
+                target.getHit(this);
               }
               this.blast();
             }
