@@ -20,9 +20,9 @@
       const linuxPath = elLinux.value;
       const winPath = linuxPath.replace(/\//g, '\\');
       elWin.value = winPath;
-      elLinux.focus();
-      elLinux.select();
-      elLinux.execCommand('copy');
+      elWin.focus();
+      elWin.select();
+      document.execCommand('copy');
     }
 
     function winToLinux() {
@@ -31,9 +31,9 @@
       const winPath = elWin.value;
       const linuxPath = winPath.replace(/\\/g, '/');
       elLinux.value = linuxPath;
-      elWin.focus();
-      elWin.select();
-      elWin.execCommand('copy');
+      elLinux.focus();
+      elLinux.select();
+      document.execCommand('copy');
     }
   </script>
 </body>
