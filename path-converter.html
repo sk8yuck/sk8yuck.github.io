@@ -15,15 +15,25 @@
 
   <script>
     function linuxToWin() {
-      const linuxPath = document.getElementById('linuxPath').value;
+      const elLinux = document.getElementById('linuxPath');
+      const elWin = document.getElementById('winPath');
+      const linuxPath = elLinux.value;
       const winPath = linuxPath.replace(/\//g, '\\');
-      document.getElementById('winPath').value = winPath;
+      elWin.value = winPath;
+      elLinux.focus();
+      elLinux.select();
+      elLinux.execCommand('copy');
     }
 
     function winToLinux() {
-      const winPath = document.getElementById('winPath').value;
+      const elLinux = document.getElementById('linuxPath');
+      const elWin = document.getElementById('winPath');
+      const winPath = elWin.value;
       const linuxPath = winPath.replace(/\\/g, '/');
-      document.getElementById('linuxPath').value = linuxPath;
+      elLinux.value = linuxPath;
+      elWin.focus();
+      elWin.select();
+      elWin.execCommand('copy');
     }
   </script>
 </body>
