@@ -7,10 +7,10 @@
 </head>
 <body>
   <div style="display: flex;flex-direction: row;justify-content: space-between;">
-    <input type="text" placeholder="win path" id="winPath">
-    <button onclick="linuxToWin"><-</button>
-    <button onclick="winToLinux">-></button>
-    <input type="text" placeholder="linux path" id="linuxPath">
+    <input type="text" placeholder="win path" id="winPath" style="flex:1 1 auto;">
+    <button onclick="return linuxToWin();"><-</button>
+    <button onclick="return winToLinux();">-></button>
+    <input type="text" placeholder="linux path" id="linuxPath" style="flex:1 1 auto;">
   </div>
 
   <script>
