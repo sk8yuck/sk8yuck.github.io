@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Path Converter</title>
+</head>
+<body>
+  <div style="display: flex;flex-direction: row;justify-content: space-between;">
+    <input type="text" placeholder="win path" id="winPath">
+    <button onclick="linuxToWin"><-</button>
+    <button onclick="winToLinux">-></button>
+    <input type="text" placeholder="linux path" id="linuxPath">
+  </div>
+
+  <script>
+    function linuxToWin() {
+      const linuxPath = document.getElementById('linuxPath').value;
+      const winPath = linuxPath.replace(/\//g, '\\');
+      document.getElementById('winPath').value = winPath;
+    }
+
+    function winToLinux() {
+      const winPath = document.getElementById('winPath').value;
+      const linuxPath = winPath.replace(/\\/g, '/');
+      document.getElementById('linuxPath').value = linuxPath;
+    }
+  </script>
+</body>
+</html>
