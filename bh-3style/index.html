@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0d0f13" media="(prefers-color-scheme:dark)">
+<title>BH 3-Style 公式手册 · 盲拧三循环</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BH 3-Style">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --text:#101828; --muted:#667085; --line:#e4e7ec;
+  --accent:#2563eb; --accent-soft:rgba(37,99,235,.12); --code-bg:#f5f7fa; --seg:#eceef2;
+  --fU:#94a3b8; --fD:#eab308; --fF:#16a34a; --fB:#2563eb; --fR:#dc2626; --fL:#ea580c;
+  --shadow:0 1px 2px rgba(16,24,40,.05);
+  color-scheme:light dark;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono","Courier New",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0d0f13; --panel:#161a20; --text:#e7eaee; --muted:#98a2b3; --line:#262c36;
+    --accent:#6c9bff; --accent-soft:rgba(108,155,255,.16); --code-bg:#1b212a; --seg:#1c222b;
+    --fU:#e2e8f0; --fD:#facc15; --fF:#22c55e; --fB:#60a5fa; --fR:#f87171; --fL:#fb923c;
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+body.lock{overflow:hidden}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1080px;margin:0 auto;padding:0 14px 48px}
+
+/* ---------- header ---------- */
+.hdr{padding:20px 0 0}
+.hdrtop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;max-width:520px}
+h1{margin:0;font-size:19px;font-weight:750;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+h1 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.sub{margin:3px 0 0;font-size:12px;color:var(--muted);letter-spacing:.01em}
+.iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--muted);width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto}
+.iconbtn:active{transform:scale(.96)}
+.iconbtn svg{width:18px;height:18px}
+
+.seg{display:flex;gap:3px;background:var(--seg);border-radius:13px;padding:3px;margin:16px 0 10px;max-width:520px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;padding:9px 4px;border-radius:10px;transition:background .15s,color .15s}
+.seg button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
+.seg em{font-style:normal;font-size:11px;font-weight:500;opacity:.55;margin-left:4px}
+
+.field{display:flex;align-items:center;gap:6px;background:var(--panel);border:1.5px solid var(--line);border-radius:15px;padding:0 6px 0 14px;height:54px;max-width:520px;transition:border-color .15s,box-shadow .15s}
+.field:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+#q{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);
+  font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:.34em;padding:0}
+#q::placeholder{font-family:var(--sans);font-size:14px;font-weight:400;letter-spacing:0;color:var(--muted)}
+.fbtn{border:0;background:transparent;color:var(--muted);font-size:18px;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:0 0 auto}
+.fbtn:active{background:var(--code-bg)}
+.fbtn svg{width:19px;height:19px}
+.fbtn[hidden]{display:none}
+
+/* ---------- pad ---------- */
+.padblock{margin-top:10px}
+.padhead{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--muted);letter-spacing:.04em;padding:2px 2px 6px;max-width:520px}
+.padhead button{border:0;background:transparent;color:var(--accent);font-size:11.5px;padding:2px 4px}
+.pad{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;max-width:520px}
+.pad[hidden]{display:none}
+.pad button{border:1px solid var(--line);background:var(--panel);border-radius:11px;padding:6px 0 5px;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;transition:background .12s,border-color .12s;min-width:0;overflow:hidden}
+.pad button:active{background:var(--code-bg);border-color:var(--accent)}
+.pad button.bufb{border-style:dashed}
+.pad b{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text)}
+.pad small{font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:0}
+.pad .dotline{display:flex;align-items:center;gap:3px}
+.pad .fd{width:5px;height:5px;border-radius:50%;flex:0 0 auto}
+
+/* ---------- chips ---------- */
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;margin:0 -14px;padding-left:14px;padding-right:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12.5px;padding:6px 11px;border-radius:999px;white-space:nowrap}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip em{font-style:normal;opacity:.6;margin-left:3px;font-size:11px}
+
+/* ---------- layout ---------- */
+.main{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.detailcol{order:-1}
+@media (min-width:960px){
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:22px;align-items:start;margin-top:14px}
+  .detailcol{order:0;grid-column:2;grid-row:1;position:sticky;top:18px}
+  .listcol{grid-column:1;grid-row:1}
+  .hdr{padding-top:26px}
+  .chips{flex-wrap:wrap;overflow:visible;margin:0;padding-left:0;padding-right:0}
+}
+
+/* ---------- detail card ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px 15px 13px;box-shadow:var(--shadow);animation:pop .18s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.chead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{display:inline-block;font-size:12px;font-weight:650;padding:4px 9px;border-radius:8px;background:var(--tb);color:var(--tf);letter-spacing:.01em;white-space:nowrap}
+.cmeta{font-size:11.5px;color:var(--muted);margin-left:auto;min-width:0;text-align:right;line-height:1.5}
+.cycle{display:flex;align-items:flex-start;justify-content:center;gap:9px;margin:16px 0 6px}
+.cwrap{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px}
+.cl{font-family:var(--mono);font-size:34px;font-weight:700;line-height:1;padding-bottom:7px;border-bottom:4px solid var(--fc);border-radius:2px}
+.cwrap.buf .cl{opacity:.45}
+.ct{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.04em}
+.ar{color:var(--muted);font-size:14px;margin-top:11px;opacity:.7}
+.cycle + .note{text-align:center;font-size:11.5px;color:var(--muted);margin:0 0 4px}
+.hr{height:1px;background:var(--line);margin:13px 0 11px}
+.algs{display:flex;flex-direction:column;gap:11px}
+.alghead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px}
+.aname{font-size:12.5px;color:var(--muted);font-weight:600}
+.aname em{font-style:normal;color:var(--text);margin-right:4px}
+.astep{font-size:11px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+.algtext{font-family:var(--mono);font-size:16.5px;line-height:1.6;letter-spacing:.01em;word-spacing:.1em;
+  background:var(--code-bg);border-radius:12px;padding:11px 12px;user-select:all;-webkit-user-select:all;position:relative;transition:filter .18s}
+.algtext.masked{filter:blur(7px);user-select:none;-webkit-user-select:none;cursor:pointer}
+.algtext.masked::after{content:"点按显示";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--sans);font-size:12px;color:var(--muted);filter:blur(0);letter-spacing:.06em}
+.acts{display:flex;gap:7px;margin-top:10px}
+.acts button{flex:1;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:12.5px;font-weight:600;padding:9px 6px;border-radius:10px}
+.acts button:active{background:var(--code-bg)}
+.msgcard{background:var(--panel);border:1px dashed var(--line);border-radius:16px;padding:16px;font-size:13px;color:var(--muted);line-height:1.7}
+.msgcard b{color:var(--text)}
+.msgcard .kw{font-family:var(--mono);font-weight:700;color:var(--text)}
+
+/* ---------- list ---------- */
+.listhead{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);padding:0 2px 8px}
+.listhead b{color:var(--text);font-weight:650}
+.list{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"l b" "a a";gap:2px 8px;text-align:left;width:100%;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 11px 8px;transition:border-color .12s}
+.row:active{border-color:var(--accent)}
+.rl{grid-area:l;font-family:var(--mono);font-size:14.5px;font-weight:700}
+.rl b{font-weight:700;margin-left:.5em}
+.rl .bf{font-style:normal;font-weight:500;color:var(--muted);font-size:13px}
+.row .badge{grid-area:b;font-size:10.5px;padding:3px 7px;border-radius:7px;align-self:center}
+.ra{grid-area:a;font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-top:2px}
+.ra i{font-style:normal;color:var(--muted);opacity:.65;margin-left:6px}
+.more{width:100%;margin-top:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12.5px;padding:11px;border-radius:11px}
+.cgrid{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:640px){.cgrid{grid-template-columns:1fr 1fr}}
+.ccard{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;transition:border-color .12s}
+.ccard:active{border-color:var(--accent)}
+.cc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cc-code{font-family:var(--mono);font-size:15px;font-weight:700;white-space:nowrap}
+.cc-code b{font-weight:700;margin-left:.45em}
+.cc-code .bf{font-style:normal;font-weight:500;color:var(--muted);font-size:13px}
+.ccard .badge{font-size:10px;padding:3px 7px;border-radius:7px}
+.cc-alg{font-family:var(--mono);font-size:12.5px;line-height:1.6;opacity:.92;word-break:break-word}
+.empty{padding:26px 10px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ---------- tags ---------- */
+.tag-pure{--tb:#dcfce7;--tf:#15803d}
+.tag-di{--tb:#dcfce7;--tf:#15803d}
+.tag-a9{--tb:#dbeafe;--tf:#1d4ed8}
+.tag-b9{--tb:#e0e7ff;--tf:#4338ca}
+.tag-orth{--tb:#f3e8ff;--tf:#7e22ce}
+.tag-col{--tb:#ffedd5;--tf:#c2410c}
+.tag-cyc{--tb:#ccfbf1;--tf:#0f766e}
+.tag-ps{--tb:#fce7f3;--tf:#be185d}
+.tag-toss{--tb:#fef3c7;--tf:#b45309}
+.tag-sp{--tb:#e2e8f0;--tf:#334155}
+.tag-other{--tb:#eef2f6;--tf:#475467}
+@media (prefers-color-scheme:dark){
+  .tag-pure,.tag-di{--tb:rgba(34,197,94,.16);--tf:#86efac}
+  .tag-a9{--tb:rgba(59,130,246,.18);--tf:#93c5fd}
+  .tag-b9{--tb:rgba(99,102,241,.20);--tf:#a5b4fc}
+  .tag-orth{--tb:rgba(168,85,247,.18);--tf:#d8b4fe}
+  .tag-col{--tb:rgba(249,115,22,.18);--tf:#fdba74}
+  .tag-cyc{--tb:rgba(20,184,166,.18);--tf:#5eead4}
+  .tag-ps{--tb:rgba(236,72,153,.18);--tf:#f9a8d4}
+  .tag-toss{--tb:rgba(245,158,11,.18);--tf:#fcd34d}
+  .tag-sp{--tb:rgba(148,163,184,.18);--tf:#cbd5e1}
+  .tag-other{--tb:rgba(148,163,184,.14);--tf:#cbd5e1}
+  .seg button.on{background:#2b3542}
+  .chip.on{color:#0b1220}
+}
+
+/* ---------- footer / top ---------- */
+.foot{margin-top:26px;font-size:11px;color:var(--muted);line-height:1.9;text-align:center;opacity:.85}
+.foot a{color:inherit}
+.totop{position:fixed;right:16px;bottom:20px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
+  background:var(--panel);color:var(--muted);display:grid;place-items:center;box-shadow:0 4px 14px rgba(16,24,40,.10);opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+.totop.show{opacity:1;pointer-events:auto}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(12,18,28,.52)}
+.modal[hidden]{display:none}
+.sheet{width:100%;max-width:620px;max-height:92vh;background:var(--panel);border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:up .2s ease-out}
+@keyframes up{from{transform:translateY(14px);opacity:.6}to{transform:none;opacity:1}}
+@media (min-width:700px){
+  .modal{align-items:center}
+  .sheet{border-radius:20px;max-height:86vh}
+}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.shead h2{margin:0;font-size:15px;font-weight:700}
+.shead button{border:0;background:transparent;color:var(--accent);font-size:14px;font-weight:650;padding:4px}
+.sbody{overflow-y:auto;padding:4px 16px 26px;-webkit-overflow-scrolling:touch}
+.sec{padding:14px 0;border-bottom:1px solid var(--line)}
+.sec:last-child{border-bottom:0}
+.sec h3{margin:0 0 4px;font-size:13px;font-weight:700}
+.sec p{margin:0 0 10px;font-size:11.5px;color:var(--muted);line-height:1.65}
+.sinput{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sinput span{font-size:12px;color:var(--muted);width:44px;flex:0 0 auto}
+.sinput input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--code-bg);border-radius:10px;padding:9px 10px;
+  font-family:var(--mono);font-size:13.5px;letter-spacing:.14em;color:var(--text);outline:0}
+.sinput input:focus{border-color:var(--accent)}
+.sinput input.bad{border-color:#e5484d}
+.warn{font-size:11.5px;color:#e5484d;margin:0 0 8px;display:none}
+.warn.show{display:block}
+.grid{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.gridlabel{margin:10px 0 0;font-size:11.5px;font-weight:650;color:var(--text)}
+.facerow{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:center}
+.facerow .fl{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted);text-align:center}
+.cells{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.cell{border:1px solid var(--line);border-radius:9px;padding:5px 4px;text-align:center;background:var(--code-bg);position:relative}
+.cell b{display:block;font-family:var(--mono);font-size:14px;line-height:1.25}
+.cell s{display:block;text-decoration:none;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.02em}
+.cell.dup{border-color:#e5484d;background:rgba(229,72,77,.07)}
+.cell.unused{opacity:.5}
+.cell.unused::after{content:"未用";position:absolute;top:2px;right:3px;font-size:7.5px;color:var(--muted);letter-spacing:0}
+.btnrow{display:flex;gap:8px;margin-top:10px}
+.btnrow button{flex:1;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:12.5px;font-weight:600;padding:10px;border-radius:10px}
+.btnrow button:active{background:var(--code-bg)}
+.sw{display:flex;align-items:center;gap:10px;font-size:13px;padding:4px 0}
+.sw input{width:18px;height:18px;accent-color:var(--accent)}
+.about{font-size:11.5px;color:var(--muted);line-height:1.8}
+.about b{color:var(--text);font-weight:650}
+.legend{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translate(-50%,10px);background:#101828;color:#fff;
+  font-size:12.5px;padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.22s;z-index:80;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-color-scheme:dark){.toast{background:#e7eaee;color:#101828}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hdr">
+    <div class="hdrtop">
+      <div>
+        <h1><span class="dot"></span>BH 3-Style 公式手册</h1>
+        <p class="sub">Beyer-Hardwick · 盲拧三循环 · 角 378 / 棱 440</p>
+      </div>
+      <button class="iconbtn" id="btnSet" aria-label="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+    <div class="seg" id="seg">
+      <button data-mode="corner" class="on">角块<em>378</em></button>
+      <button data-mode="edge">棱块<em>440</em></button>
+    </div>
+    <div class="field">
+      <input id="q" type="text" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="输入编码（缓冲块可省略）" enterkeyhint="done">
+      <button class="fbtn" id="btnClear" hidden aria-label="清空">✕</button>
+      <button class="fbtn" id="btnRand" aria-label="随机一例" title="随机一例">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="detailcol" id="detailcol"><section id="detail"></section></div>
+    <div class="listcol">
+      <div class="padblock" id="padblock">
+        <div class="padhead">
+          <span>编码盘 · 点按输入</span>
+          <button id="btnPad">收起</button>
+        </div>
+        <div class="pad" id="pad"></div>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="listhead"><span id="listCount"></span><span id="listHint"></span></div>
+      <div class="list" id="list"></div>
+      <button class="more" id="more" hidden></button>
+    </div>
+  </main>
+
+  <footer class="foot">
+    缓冲块：角 URB（B）· 棱 UR（B）｜ 数据源：speedcubing.com/chris（Beyer-Hardwick 原始表）<br>
+    单文件离线运行，可直接保存到手机使用
+  </footer>
+</div>
+
+<button class="totop" id="totop" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="设置">
+    <div class="shead"><h2>设置</h2><button id="btnClose">完成</button></div>
+    <div class="sbody">
+      <div class="sec">
+        <h3>自定义编码</h3>
+        <p>按 Speffz 的贴纸顺序填写 24 个互不相同的字符 —— 字母、数字、汉字都可以（如自己编的中文编码：天地人…）。默认即 Speffz；改动后查询与显示都使用你的编码，下方对照表同步更新。</p>
+        <div class="sinput"><span>角块</span><input id="sc" spellcheck="false" autocomplete="off" autocorrect="off"></div>
+        <div class="sinput"><span>棱块</span><input id="se" spellcheck="false" autocomplete="off" autocorrect="off"></div>
+        <p class="warn" id="warn">需要 24 个互不相同的字符，不能含空格。</p>
+        <p class="gridlabel">角块贴纸 · 24</p>
+        <div class="grid">
+          <div class="facerow"><div class="fl">U</div><div class="cells" id="gc"></div></div>
+          <div class="facerow"><div class="fl">L</div><div class="cells" id="gc2"></div></div>
+          <div class="facerow"><div class="fl">F</div><div class="cells" id="gc3"></div></div>
+          <div class="facerow"><div class="fl">R</div><div class="cells" id="gc4"></div></div>
+          <div class="facerow"><div class="fl">B</div><div class="cells" id="gc5"></div></div>
+          <div class="facerow"><div class="fl">D</div><div class="cells" id="gc6"></div></div>
+        </div>
+        <p class="gridlabel" style="margin-top:16px">棱块贴纸 · 24</p>
+        <div class="grid" style="margin-top:6px">
+          <div class="facerow"><div class="fl">U</div><div class="cells" id="ge"></div></div>
+          <div class="facerow"><div class="fl">L</div><div class="cells" id="ge2"></div></div>
+          <div class="facerow"><div class="fl">F</div><div class="cells" id="ge3"></div></div>
+          <div class="facerow"><div class="fl">R</div><div class="cells" id="ge4"></div></div>
+          <div class="facerow"><div class="fl">B</div><div class="cells" id="ge5"></div></div>
+          <div class="facerow"><div class="fl">D</div><div class="cells" id="ge6"></div></div>
+        </div>
+        <div class="btnrow"><button id="btnReset">恢复 Speffz 默认</button></div>
+      </div>
+
+      <div class="sec">
+        <h3>练习模式</h3>
+        <label class="sw"><input type="checkbox" id="swHide"> 遮住公式，点按后再显示</label>
+      </div>
+
+      <div class="sec about">
+        <h3>分类说明</h3>
+        <p style="margin-bottom:6px">角块三循环共 8 类；棱块在此基础上增加 B9、Slice-Plane（SP）以及 Wide / Setup 变体。分类名完全沿用原始网站写法，未作翻译。</p>
+        <div class="legend" id="legend"></div>
+        <p style="margin-top:10px"><b>缓冲块</b>：角块 URB（编码 B），棱块 UR（编码 B）。实战中缓冲块固定，因此查询时<b>可以省略</b>——只输入另外两个编码即可，缓冲块默认补在首位；也可以输入完整三个（顺序任意，会自动旋转对齐到缓冲块起点）。结果中缓冲块以括号显示。</p>
+        <p><b>关于未用贴纸</b>：缓冲块的另外两个（棱块一个）贴纸不会出现在任何三循环中，编码表里标注为「未用」。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
+
+<script>window.__BH_DATA__ = {"corner":{"buffer":"URB","stk":["UBL","URB","UFR","ULF","LUB","LFU","LDF","LBD","FUL","FRU","FDR","FLD","RUF","RUB","RDB","RFD","BUR","BLU","BDL","BRD","DFL","DRF","DBR","DLB"],"cases":[{"s":["URB","UBL","ULF"],"algs":[{"a":"L F' L B2 L' F L B2 L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UBL","UFR"],"algs":[{"a":"R2 B2 R F R' B2 R F' R","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UBL","FUL"],"algs":[{"a":"L F R' F' L' F R F'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UBL","FRU"],"algs":[{"a":"R B L B' R' B L' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UBL","FLD"],"algs":[{"a":"U' B D' B' U B D B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UBL","FDR"],"algs":[{"a":"U' L' D2 L U L' D2 L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UBL","RUF"],"algs":[{"a":"B U2 B D B' U2BD'B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UBL","RFD"],"algs":[{"a":"U' B D2 B' U B D2 B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UBL","RDB"],"algs":[{"a":"U' L' D L U L' D' L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UBL","BRD"],"algs":[{"a":"R' B L B' R B L' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UBL","BDL"],"algs":[{"a":"U' B D B' U B D' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UBL","LFU"],"algs":[{"a":"B2 D' B U2 B' D B U2 B","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UBL","LBD"],"algs":[{"a":"U' L' D' L U L' D L","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UBL","LDF"],"algs":[{"a":"B' D2 B U B' D2 B U'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UBL","DFL"],"algs":[{"a":"L2 D R2 D' L2 D R2 D'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UBL","DRF"],"algs":[{"a":"R2 B L B' R2 B L' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UBL","DLB"],"algs":[{"a":"D L2 D R2 D' L2 D R2 D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UBL","DBR"],"algs":[{"a":"D2 L2 D R2 D' L2 D R2 D","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","ULF","UBL"],"algs":[{"a":"L2 B2 L' F' L B2 L' F L'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","ULF","UFR"],"algs":[{"a":"R B' R F2 R' B R F2 R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","ULF","FRU"],"algs":[{"a":"L2 B2 L' F2 L B2 L' F2 L'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","ULF","FLD"],"algs":[{"a":"U2 F' D' F U2 F' D F","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","ULF","FDR"],"algs":[{"a":"B' D B U2 B' D' B U2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","ULF","RUF"],"algs":[{"a":"B' R2 B' L2 B R2 B' L2 B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","ULF","RFD"],"algs":[{"a":"U2 L D' L' U2 L D L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","ULF","RDB"],"algs":[{"a":"U2 F' D2 F U2 F' D2 F","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","ULF","BLU"],"algs":[{"a":"R B2 R F2 R' B2 R F2 R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","ULF","BRD"],"algs":[{"a":"U2 L D2 L' U2 L D2 L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","ULF","BDL"],"algs":[{"a":"U2 F' D F U2 F' D' F","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","ULF","LUB"],"algs":[{"a":"F2 R2 F L2 F' R2 F L2 F","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","ULF","LBD"],"algs":[{"a":"R D' R' U2 R D R' U2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","ULF","LDF"],"algs":[{"a":"U2 L D L' U2 L D' L'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","ULF","DFL"],"algs":[{"a":"R U2 R' U' L2 U R U' L2 U' R'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","ULF","DRF"],"algs":[{"a":"U F2 U' F2 U' R2 U F2 U F2 U' R2","n":12,"m":"HTM","c":"Per Special"}]},{"s":["URB","ULF","DLB"],"algs":[{"a":"U2 F U2 F' L2 F' L2 F L2 B L2 B'","n":12,"m":"HTM","c":"Per Special"}]},{"s":["URB","ULF","DBR"],"algs":[{"a":"R B R2 B L' B' R2 B L B2 R'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","UFR","UBL"],"algs":[{"a":"R' F R' B2 R F' R' B2 R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UFR","ULF"],"algs":[{"a":"R2 F2 R' B' R F2 R' B R'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UFR","FUL"],"algs":[{"a":"R2 D R' U2 R D' R' U2 R'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UFR","FLD"],"algs":[{"a":"R D2 R' U' R D2 R' U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UFR","FDR"],"algs":[{"a":"U F D F' U' F D' F'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UFR","RFD"],"algs":[{"a":"U R' D' R U' R' D R","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UFR","RDB"],"algs":[{"a":"R D R' U' R D' R' U","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UFR","BLU"],"algs":[{"a":"R' U2 R' D' R U2 R' D R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UFR","BRD"],"algs":[{"a":"U F D' F' U' F D F'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UFR","BDL"],"algs":[{"a":"U R' D2 R U' R' D2 R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UFR","LUB"],"algs":[{"a":"L F' L' B L F L' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UFR","LFU"],"algs":[{"a":"R B R' F R B' R' F'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UFR","LBD"],"algs":[{"a":"U F D2 F' U' F D2 F'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UFR","LDF"],"algs":[{"a":"U R' D R U' R' D' R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","UFR","DFL"],"algs":[{"a":"R B R' F2 R B' R' F2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","UFR","DRF"],"algs":[{"a":"D' F2 D' B2 D F2 D' B2 D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","UFR","DLB"],"algs":[{"a":"D F2 D' B2 D F2 D' B2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","UFR","DBR"],"algs":[{"a":"D2 F2 D' B2 D F2 D' B2 D'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FUL","UBL"],"algs":[{"a":"F R' F' L F R F' L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","UFR"],"algs":[{"a":"R U2 R D R' U2 R D' R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FUL","FRU"],"algs":[{"a":"U L U' R' U L' U' R","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FUL","FLD"],"algs":[{"a":"F' L B2 L' F L B2 L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","FDR"],"algs":[{"a":"F2 D B' D' F2 D B D'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","RUF"],"algs":[{"a":"F2 D' F U2 F' D F U2 F","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FUL","RFD"],"algs":[{"a":"U R' B2 R F R' B2 R F' U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","FUL","RDB"],"algs":[{"a":"D' F2 D B' D' F2 D B","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","FUL","BLU"],"algs":[{"a":"F R' U2 R F' R' F U2 F' R","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","FUL","BRD"],"algs":[{"a":"B' L2 B R B' L2 B R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","BDL"],"algs":[{"a":"F R' F' L2 F R F' L2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","LUB"],"algs":[{"a":"L F L' B L F' L' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FUL","LBD"],"algs":[{"a":"U L' B R2 B' L B R2 B' U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","FUL","LDF"],"algs":[{"a":"D F2 D B' D' F2 D B D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FUL","DFL"],"algs":[{"a":"F R' F' L' F R F' L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","DRF"],"algs":[{"a":"D' L D R2 D' L' D R2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","DLB"],"algs":[{"a":"B2 R' F R B2 R' F' R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FUL","DBR"],"algs":[{"a":"D2 L D R2 D' L' D R2 D","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FRU","UBL"],"algs":[{"a":"R' F' L F R F' L' F","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FRU","ULF"],"algs":[{"a":"L F2 L B2 L' F2 L B2 L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FRU","FUL"],"algs":[{"a":"U' B' U F U' B U F'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FRU","FLD"],"algs":[{"a":"U' B' U F2 U' B U F2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FRU","FDR"],"algs":[{"a":"U' B' U F' U' B U F","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FRU","RFD"],"algs":[{"a":"U2 L' U R2 U' L U R2 U","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FRU","RDB"],"algs":[{"a":"D' F D B' D' F' D B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FRU","BLU"],"algs":[{"a":"L2 F2 L B2 L' F2 L B2 L","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FRU","BRD"],"algs":[{"a":"U F' U B2 U' F U B2 U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FRU","BDL"],"algs":[{"a":"U' L U R U' L' U R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FRU","LUB"],"algs":[{"a":"U' L' U R U' L U R'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FRU","LFU"],"algs":[{"a":"R' F' L' F R F' L F","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FRU","LBD"],"algs":[{"a":"R' U L2 U' R U L2 U'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FRU","LDF"],"algs":[{"a":"R' U L' U' R U L U'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FRU","DFL"],"algs":[{"a":"U' L2 U R U' L2 U R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FRU","DRF"],"algs":[{"a":"U2 F2 U B U' F2 U B' U","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FRU","DLB"],"algs":[{"a":"L' F2 L B2 L' F2 L B2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","FRU","DBR"],"algs":[{"a":"U R2 U L U' R2 U L' U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FLD","UBL"],"algs":[{"a":"U R D2 R' U' R D2 R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FLD","ULF"],"algs":[{"a":"U2 R D2 R' U2 R D2 R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FLD","UFR"],"algs":[{"a":"U' R D2 R' U R D2 R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FLD","FUL"],"algs":[{"a":"L B2 L' F' L B2 L' F","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FLD","FRU"],"algs":[{"a":"F2 U' B' U F2 U' B U","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FLD","FDR"],"algs":[{"a":"F' D B' D' F D B D'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FLD","RUF"],"algs":[{"a":"B' R2 B' L B R2 B' L' B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FLD","RFD"],"algs":[{"a":"D F' U F D' F' U' F","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","FLD","RDB"],"algs":[{"a":"B R' F2 R B' R' F2 R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FLD","BLU"],"algs":[{"a":"U B2 D' B' U2 B D B' U2 B' U'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","FLD","BRD"],"algs":[{"a":"D2 B U B' D2 B U' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FLD","BDL"],"algs":[{"a":"F2 R' F' L2 F R F' L2 F'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FLD","LUB"],"algs":[{"a":"U' F U B U' F' U B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FLD","LFU"],"algs":[{"a":"D2 R D L2 D' R' D L2 D","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FLD","LBD"],"algs":[{"a":"L' U2 L D L' U2 L D'","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","FLD","DRF"],"algs":[{"a":"U L' U F2 U' L U L' F2 L U2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","FLD","DLB"],"algs":[{"a":"D F D' B2 D F' D' B2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FLD","DBR"],"algs":[{"a":"U R2 U L' U' R2 U L U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FDR","UBL"],"algs":[{"a":"U B' D B U' B' D' B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FDR","ULF"],"algs":[{"a":"U2 B' D B U2 B' D' B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FDR","UFR"],"algs":[{"a":"U' B' D B U B' D' B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FDR","FUL"],"algs":[{"a":"D B' D' F2 D B D' F2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FDR","FRU"],"algs":[{"a":"F' U' B' U F U' B U","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FDR","FLD"],"algs":[{"a":"F L B2 L' F' L B2 L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FDR","RUF"],"algs":[{"a":"D B' R2 B D' B' D R2 D' B","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","FDR","RDB"],"algs":[{"a":"R F R' B' R F' R' B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","FDR","BLU"],"algs":[{"a":"L2 F L B2 L' F' L B2 L","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FDR","BRD"],"algs":[{"a":"B R2 B L B' R2 B L' B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FDR","BDL"],"algs":[{"a":"D2 L U' L' D2 L U L'","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","FDR","LUB"],"algs":[{"a":"U' F2 U B U' F2 U B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FDR","LFU"],"algs":[{"a":"U R' F L2 F' R F L2 F' U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","FDR","LBD"],"algs":[{"a":"U F' L2 F R F' L2 F R' U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","FDR","LDF"],"algs":[{"a":"D' F U2 F' D F U2 F'","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","FDR","DFL"],"algs":[{"a":"L D2 L U' L' D2 L U L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","FDR","DLB"],"algs":[{"a":"L' F L B2 L' F' L B2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","FDR","DBR"],"algs":[{"a":"D2 L' D R2 D' L D R2 D","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","UBL"],"algs":[{"a":"B2 D B' U2 B D' B' U2 B'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","ULF"],"algs":[{"a":"B2 L2 B R2 B' L2 B R2 B","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","FUL"],"algs":[{"a":"F' U2 F' D' F U2 F' D F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","FLD"],"algs":[{"a":"B2 L B R2 B' L' B R2 B","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","FDR"],"algs":[{"a":"B' D R2 D' B D B' R2 B D'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","RUF","RFD"],"algs":[{"a":"F R2 F L F' R2 F L' F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","RDB"],"algs":[{"a":"F' U2 F' D2 F U2 F' D2 F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","BLU"],"algs":[{"a":"L F' U2 F L' F' L U2 L' F","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","RUF","BRD"],"algs":[{"a":"B2 L' B R2 B' L B R2 B","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","BDL"],"algs":[{"a":"F' U2 F' D F U2 F' D' F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","LUB"],"algs":[{"a":"F R2 F L2 F' R2 F L2 F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","LFU"],"algs":[{"a":"B L' U2 L B' L' B U2 B' L","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","RUF","LBD"],"algs":[{"a":"F R2 F L' F' R2 F L F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","LDF"],"algs":[{"a":"U2 B' U2 B' D2 B U2 B' D2 B2 U2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","RUF","DFL"],"algs":[{"a":"B2 D' B' U2 B D B' U2 B'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","DRF"],"algs":[{"a":"B2 D2 B' U2 B D2 B' U2 B'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RUF","DLB"],"algs":[{"a":"U R2 D' R' U2 R D R' U2 R' U'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","RUF","DBR"],"algs":[{"a":"D' F R2 F' D F D' R2 D F'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","RFD","UBL"],"algs":[{"a":"B D2 B' U' B D2 B' U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RFD","ULF"],"algs":[{"a":"L D' L' U2 L D L' U2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RFD","UFR"],"algs":[{"a":"R' D' R U R' D R U'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RFD","FUL"],"algs":[{"a":"U F R' B2 R F' R' B2 R U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","RFD","FRU"],"algs":[{"a":"U' R2 U' L' U R2 U' L U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RFD","FLD"],"algs":[{"a":"F' U F D F' U' F D'","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","RFD","RUF"],"algs":[{"a":"F2 L F' R2 F L' F' R2 F'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RFD","RDB"],"algs":[{"a":"D' F' D B' D' F D B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RFD","BLU"],"algs":[{"a":"L2 D' L' U2 L D L' U2 L'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RFD","BRD"],"algs":[{"a":"F' U F D' F' U' F D","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","RFD","BDL"],"algs":[{"a":"U R B2 R' F' R B2 R' F U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","RFD","LUB"],"algs":[{"a":"L F2 L' B L F2 L' B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RFD","LFU"],"algs":[{"a":"F2 L' B L F2 L' B' L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RFD","LBD"],"algs":[{"a":"F' U F D2 F' U' F D2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","RFD","LDF"],"algs":[{"a":"L' F2 L' B L F2 L' B' L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RFD","DFL"],"algs":[{"a":"F D' B2 D F' D' B2 D","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RFD","DLB"],"algs":[{"a":"B2 U F' U' B2 U F U'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RFD","DBR"],"algs":[{"a":"F' U R2 U' F U F' R2 F U'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","RDB","UBL"],"algs":[{"a":"U R D R' U' R D' R'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RDB","ULF"],"algs":[{"a":"U2 R D R' U2 R D' R'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RDB","UFR"],"algs":[{"a":"U' R D R' U R D' R'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RDB","FUL"],"algs":[{"a":"R' F R B R' F' R B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RDB","FRU"],"algs":[{"a":"U F U' B U F' U' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RDB","FLD"],"algs":[{"a":"R' F2 R B R' F2 R B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RDB","FDR"],"algs":[{"a":"R' U' R D R' U R D'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RDB","RUF"],"algs":[{"a":"F2 D2 F U2 F' D2 F U2 F","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RDB","RFD"],"algs":[{"a":"U F' U' B U F U' B'","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","RDB","BLU"],"algs":[{"a":"R B2 R F R' B2 R F' R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RDB","BDL"],"algs":[{"a":"R' U' R D' R' U R D","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RDB","LUB"],"algs":[{"a":"U2 R2 U L U' R2 U L' U","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RDB","LFU"],"algs":[{"a":"B' R F2 R' B R F2 R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RDB","LBD"],"algs":[{"a":"R2 F' R B2 R' F R B2 R","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RDB","LDF"],"algs":[{"a":"R' U' R D2 R' U R D2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","RDB","DFL"],"algs":[{"a":"U F2 U' B U F2 U' B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","RDB","DRF"],"algs":[{"a":"F D2 F U2 F' D2 F U2 F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","RDB","DLB"],"algs":[{"a":"R2 D2 R U R' D2 R U' R","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","ULF"],"algs":[{"a":"R2 F2 R' B2 R F2 R' B2 R'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","UFR"],"algs":[{"a":"R2 D' R U2 R' D R U2 R","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","FUL"],"algs":[{"a":"R' F U2 F' R F R' U2 R F'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","BLU","FRU"],"algs":[{"a":"L' B2 L' F2 L B2 L' F2 L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","FLD"],"algs":[{"a":"U B U2 B D' B' U2 B D B2 U'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","BLU","FDR"],"algs":[{"a":"L' B2 L' F L B2 L' F' L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","RUF"],"algs":[{"a":"F' L U2 L' F L F' U2 F L'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","BLU","RFD"],"algs":[{"a":"L U2 L D' L' U2 L D L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","RDB"],"algs":[{"a":"R2 F R' B2 R F' R' B2 R'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","BRD"],"algs":[{"a":"L U2 L D2 L' U2 L D2 L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","BDL"],"algs":[{"a":"L' B2 L' F' L B2 L' F L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","LFU"],"algs":[{"a":"L U2 L D L' U2 L D' L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","LBD"],"algs":[{"a":"R D' B2 D R' D' R B2 R' D","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","BLU","LDF"],"algs":[{"a":"R2 F' R' B2 R F R' B2 R'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","DFL"],"algs":[{"a":"R2 D R U2 R' D' R U2 R","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","DRF"],"algs":[{"a":"U2 L2 D2 L U2 L' D2 L U2 L U2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","BLU","DLB"],"algs":[{"a":"R2 D2 R U2 R' D2 R U2 R","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BLU","DBR"],"algs":[{"a":"D L' B2 L D' L' D B2 D' L","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","BRD","UBL"],"algs":[{"a":"U B' D' B U' B' D B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","BRD","ULF"],"algs":[{"a":"U2 B' D' B U2 B' D B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","BRD","UFR"],"algs":[{"a":"U' B' D' B U B' D B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","BRD","FUL"],"algs":[{"a":"R B' L2 B R' B' L2 B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BRD","FRU"],"algs":[{"a":"U2 B2 U' F' U B2 U' F U'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BRD","FLD"],"algs":[{"a":"D2 L' U2 L D2 L' U2 L","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","BRD","FDR"],"algs":[{"a":"B2 L B' R2 B L' B' R2 B'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BRD","RUF"],"algs":[{"a":"B' R2 B' L' B R2 B' L B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BRD","RFD"],"algs":[{"a":"D' F' U F D F' U' F","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","BRD","BLU"],"algs":[{"a":"L2 D2 L' U2 L D2 L' U2 L'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BRD","BDL"],"algs":[{"a":"U' L U R' U' L' U R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BRD","LUB"],"algs":[{"a":"U' L' U R' U' L U R","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","BRD","LFU"],"algs":[{"a":"R D L2 D' R' D L2 D'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BRD","LBD"],"algs":[{"a":"R B' L' B R' B' L B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","BRD","LDF"],"algs":[{"a":"B L2 B' R' B L2 B' R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BRD","DFL"],"algs":[{"a":"U' L2 U R' U' L2 U R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BRD","DRF"],"algs":[{"a":"D' F D' B2 D F' D' B2 D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BRD","DLB"],"algs":[{"a":"L' D2 L' U2 L D2 L' U2 L2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BDL","UBL"],"algs":[{"a":"L B' R' B L' B' R B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","BDL","ULF"],"algs":[{"a":"F' D F U2 F' D' F U2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BDL","UFR"],"algs":[{"a":"R' D2 R U R' D2 R U'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BDL","FUL"],"algs":[{"a":"L2 F R' F' L2 F R F'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BDL","FRU"],"algs":[{"a":"R U' L U R' U' L' U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BDL","FLD"],"algs":[{"a":"F L2 F R' F' L2 F R F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BDL","FDR"],"algs":[{"a":"L U' L' D2 L U L' D2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","BDL","RUF"],"algs":[{"a":"F2 D F U2 F' D' F U2 F","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BDL","RFD"],"algs":[{"a":"U F' R B2 R' F R B2 R' U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","BDL","RDB"],"algs":[{"a":"D' R' U' R D R' U R","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","BDL","BLU"],"algs":[{"a":"L2 F' L B2 L' F L B2 L","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BDL","BRD"],"algs":[{"a":"R' U' L U R U' L' U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BDL","LUB"],"algs":[{"a":"U B2 U F U' B2 U F' U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","BDL","LFU"],"algs":[{"a":"U L' F2 L B L' F2 L B' U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","BDL","LDF"],"algs":[{"a":"D F U2 F' D' F U2 F'","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","BDL","DFL"],"algs":[{"a":"L' D R2 D' L D R2 D'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BDL","DRF"],"algs":[{"a":"R2 U' L U R2 U' L' U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","BDL","DBR"],"algs":[{"a":"L U' B2 U L' U' L B2 L' U","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","LUB","ULF"],"algs":[{"a":"F' L2 F' R2 F L2 F' R2 F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LUB","UFR"],"algs":[{"a":"R' F' R B' R' F R B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LUB","FUL"],"algs":[{"a":"R' F R B' R' F' R B","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","LUB","FRU"],"algs":[{"a":"U F U' B' U F' U' B","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LUB","FLD"],"algs":[{"a":"R' F2 R B' R' F2 R B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LUB","FDR"],"algs":[{"a":"B U' F2 U B' U' F2 U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LUB","RUF"],"algs":[{"a":"F2 L2 F' R2 F L2 F' R2 F'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LUB","RFD"],"algs":[{"a":"U F' U' B' U F U' B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LUB","RDB"],"algs":[{"a":"U' L U' R2 U L' U' R2 U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LUB","BRD"],"algs":[{"a":"R' U' L' U R U' L U","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LUB","BDL"],"algs":[{"a":"U2 F U' B2 U F' U' B2 U'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LUB","LFU"],"algs":[{"a":"U R U' L' U R' U' L","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LUB","LBD"],"algs":[{"a":"U R U' L U R' U' L'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LUB","LDF"],"algs":[{"a":"U R U' L2 U R' U' L2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LUB","DFL"],"algs":[{"a":"U F2 U' B' U F2 U' B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LUB","DRF"],"algs":[{"a":"R2 U' L' U R2 U' L U","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LUB","DLB"],"algs":[{"a":"U2 L2 U' R' U L2 U' R U'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LUB","DBR"],"algs":[{"a":"U' B2 U' F' U B2 U' F U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LFU","UBL"],"algs":[{"a":"B' U2 B' D' B U2 B' D B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LFU","UFR"],"algs":[{"a":"F R B R' F' R B' R'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LFU","FRU"],"algs":[{"a":"R B L' B' R' B L B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","FLD"],"algs":[{"a":"D' L2 D' R D L2 D' R' D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LFU","FDR"],"algs":[{"a":"U F L2 F' R' F L2 F' R U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","LFU","RUF"],"algs":[{"a":"L' B U2 B' L B L' U2 L B'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","LFU","RFD"],"algs":[{"a":"L' B L F2 L' B' L F2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","RDB"],"algs":[{"a":"R F2 R' B' R F2 R' B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","BLU"],"algs":[{"a":"L2 D L' U2 L D' L' U2 L'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LFU","BRD"],"algs":[{"a":"R' B L' B' R B L B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","BDL"],"algs":[{"a":"U B L' F2 L B' L' F2 L U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","LFU","LUB"],"algs":[{"a":"U' F' U B U' F U B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LFU","LBD"],"algs":[{"a":"L2 D' R D L2 D' R' D","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","LDF"],"algs":[{"a":"L F' R2 F L' F' R2 F","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","DFL"],"algs":[{"a":"F' D' B2 D F D' B2 D","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","DRF"],"algs":[{"a":"R2 B L' B' R2 B L B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","DLB"],"algs":[{"a":"D F' D' B2 D F D' B2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LFU","DBR"],"algs":[{"a":"D2 F' D' B2 D F D' B2 D'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LBD","UBL"],"algs":[{"a":"U R D' R' U' R D R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","ULF"],"algs":[{"a":"U2 R D' R' U2 R D R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","UFR"],"algs":[{"a":"U' R D' R' U R D R'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","FUL"],"algs":[{"a":"U B R2 B' L' B R2 B' L U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","LBD","FRU"],"algs":[{"a":"U L2 U' R' U L2 U' R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","FLD"],"algs":[{"a":"D L' U2 L D' L' U2 L","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","LBD","FDR"],"algs":[{"a":"U R F' L2 F R' F' L2 F U'","n":10,"m":"HTM","c":"Orthogonals"}]},{"s":["URB","LBD","RUF"],"algs":[{"a":"F2 L' F' R2 F L F' R2 F'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LBD","RFD"],"algs":[{"a":"D2 F' U F D2 F' U' F","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","LBD","RDB"],"algs":[{"a":"R' B2 R' F' R B2 R' F R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LBD","BLU"],"algs":[{"a":"D' R B2 R' D R D' B2 D R'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","LBD","BRD"],"algs":[{"a":"D' B U B' D B U' B'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","LBD","LUB"],"algs":[{"a":"D' R D L' D' R' D L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","LFU"],"algs":[{"a":"D' R D L2 D' R' D L2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","LDF"],"algs":[{"a":"D' R D L D' R' D L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","DFL"],"algs":[{"a":"F' D2 F' U F D2 F' U' F2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LBD","DRF"],"algs":[{"a":"F L' F' R2 F L F' R2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LBD","DBR"],"algs":[{"a":"D2 F D' B2 D F' D' B2 D'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LDF","UBL"],"algs":[{"a":"U B' D2 B U' B' D2 B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","ULF"],"algs":[{"a":"U2 B' D2 B U2 B' D2 B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","UFR"],"algs":[{"a":"U' B' D2 B U B' D2 B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","FUL"],"algs":[{"a":"D2 B' D' F2 D B D' F2 D'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LDF","FRU"],"algs":[{"a":"U L' U' R' U L U' R","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","FDR"],"algs":[{"a":"F U2 F' D' F U2 F' D","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","LDF","RUF"],"algs":[{"a":"U2 B2 D2 B U2 B' D2 B U2 B U2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","LDF","RFD"],"algs":[{"a":"L2 B L F2 L' B' L F2 L","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LDF","RDB"],"algs":[{"a":"F U2 F' D2 F U2 F' D2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","LDF","BLU"],"algs":[{"a":"R B2 R F' R' B2 R F R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","LDF","BRD"],"algs":[{"a":"R' B L2 B' R B L2 B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","BDL"],"algs":[{"a":"F U2 F' D F U2 F' D'","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","LDF","LUB"],"algs":[{"a":"F' R2 F L2 F' R2 F L2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","LDF","LFU"],"algs":[{"a":"F' R2 F L F' R2 F L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","LBD"],"algs":[{"a":"F' R2 F L' F' R2 F L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","DRF"],"algs":[{"a":"R2 B L2 B' R2 B L2 B'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","LDF","DLB"],"algs":[{"a":"U B D2 B U' B' D2 B U B2 U'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","LDF","DBR"],"algs":[{"a":"U' B2 U' F U B2 U' F' U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DFL","UBL"],"algs":[{"a":"D R2 D' L2 D R2 D' L2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","DFL","ULF"],"algs":[{"a":"R U L2 U R' U' L2 U R U2 R'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DFL","UFR"],"algs":[{"a":"F2 R B R' F2 R B' R'","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","DFL","FUL"],"algs":[{"a":"D R2 D' L D R2 D' L'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","FRU"],"algs":[{"a":"R U' L2 U R' U' L2 U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","FDR"],"algs":[{"a":"L2 U' L' D2 L U L' D2 L'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DFL","RUF"],"algs":[{"a":"B U2 B D' B' U2 B D B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DFL","RFD"],"algs":[{"a":"D' B2 D F D' B2 D F'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","RDB"],"algs":[{"a":"R F' R' B' R F R' B","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","BLU"],"algs":[{"a":"R' U2 R' D R U2 R' D' R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DFL","BRD"],"algs":[{"a":"R' U' L2 U R U' L2 U","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","BDL"],"algs":[{"a":"D R2 D' L' D R2 D' L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","LUB"],"algs":[{"a":"B' U F2 U' B U F2 U'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","LFU"],"algs":[{"a":"F L' B L F' L' B' L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DFL","LBD"],"algs":[{"a":"F2 U F D2 F' U' F D2 F","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DFL","DRF"],"algs":[{"a":"R2 U' L2 U R2 U' L2 U","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","DFL","DLB"],"algs":[{"a":"L' F' L B2 L' F L B2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","DFL","DBR"],"algs":[{"a":"R2 U2 L2 U R2 U' L2 U R2 U R2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DRF","UBL"],"algs":[{"a":"R2 D' L2 D R2 D'L2 D","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","DRF","ULF"],"algs":[{"a":"U2 F R2 F' R2 F' U2 F R2 F R2 F'","n":12,"m":"HTM","c":"Per Special"}]},{"s":["URB","DRF","UFR"],"algs":[{"a":"D2 B2 D F2 D' B2 D F2 D","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DRF","FUL"],"algs":[{"a":"R2 D' L D R2 D' L' D","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DRF","FRU"],"algs":[{"a":"U' B U' F2 U B' U' F2 U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DRF","FLD"],"algs":[{"a":"U2 R2 U2 R D2 R' U2 R D2 R U2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DRF","RUF"],"algs":[{"a":"B U2 B D2 B' U2 B D2 B2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DRF","RDB"],"algs":[{"a":"F2 U2 F' D2 F U2 F' D2 F'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DRF","BLU"],"algs":[{"a":"U2 L' U2 L' D2 L U2 L' D2 L2 U2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DRF","BRD"],"algs":[{"a":"D2 B2 D F D' B2 D F' D","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DRF","BDL"],"algs":[{"a":"U' L U R2 U' L' U R2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DRF","LUB"],"algs":[{"a":"U' L' U R2 U' L U R2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","DRF","LFU"],"algs":[{"a":"B L' B' R2 B L B' R2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DRF","LBD"],"algs":[{"a":"R2 F L' F' R2 F L F'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DRF","LDF"],"algs":[{"a":"R2 D' L' D R2 D' L D","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","DRF","DFL"],"algs":[{"a":"U' L2 U R2 U' L2 U R2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","DRF","DLB"],"algs":[{"a":"U R2 U' B2 U' B2 U B2 D B2 D' R2","n":12,"m":"HTM","c":"Per Special"}]},{"s":["URB","DRF","DBR"],"algs":[{"a":"U' B2 U' F2 U B2 U' F2 U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DLB","UBL"],"algs":[{"a":"D2 R2 D' L2 D R2 D' L2 D'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DLB","ULF"],"algs":[{"a":"U B2 U' B2 U' L2 U B2 U B2 U' L2","n":12,"m":"HTM","c":"Per Special"}]},{"s":["URB","DLB","UFR"],"algs":[{"a":"R' F' R B2 R' F R B2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","DLB","FUL"],"algs":[{"a":"R' F R B2 R' F' R B2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DLB","FRU"],"algs":[{"a":"U F U' B2 U F' U' B2","n":8,"m":"HTM","c":"Direct Insert"}]},{"s":["URB","DLB","FLD"],"algs":[{"a":"R' F2 R B2 R' F2 R B2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","DLB","FDR"],"algs":[{"a":"B2 L' F L B2 L' F' L","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DLB","RUF"],"algs":[{"a":"U R U2 R D' R' U2 R D R2 U'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DLB","RFD"],"algs":[{"a":"U F' U' B2 U F U' B2","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DLB","RDB"],"algs":[{"a":"R' U R' D2 R U' R' D2 R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DLB","BLU"],"algs":[{"a":"R' U2 R' D2 R U2 R' D2 R2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DLB","BRD"],"algs":[{"a":"L2 U2 L D2 L' U2 L D2 L","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DLB","LUB"],"algs":[{"a":"U R' U L2 U' R U L2 U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DLB","LFU"],"algs":[{"a":"B2 D F' D' B2 D F D'","n":8,"m":"HTM","c":"Drop and Catch"}]},{"s":["URB","DLB","LDF"],"algs":[{"a":"U B2 U' B' D2 B U B' D2 B' U'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DLB","DFL"],"algs":[{"a":"U F2 U' B2 U F2 U' B2","n":8,"m":"HTM","c":"Toss Up"}]},{"s":["URB","DLB","DRF"],"algs":[{"a":"U' B2 U R2 U R2 U' R2 D' R2 D B2","n":12,"m":"HTM","c":"Per Special"}]},{"s":["URB","DLB","DBR"],"algs":[{"a":"U R2 U L2 U' R2 U L2 U2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","UBL"],"algs":[{"a":"D' R2 D' L2 D R2 D' L2 D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","ULF"],"algs":[{"a":"R B2 L' B' R2 B L B' R2 B' R'","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DBR","UFR"],"algs":[{"a":"D B2 D F2 D' B2 D F2 D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","FUL"],"algs":[{"a":"D' R2 D' L D R2 D' L' D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","FRU"],"algs":[{"a":"U2 L U' R2 U L' U' R2 U'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","FLD"],"algs":[{"a":"U2 L' U' R2 U L U' R2 U'","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","FDR"],"algs":[{"a":"D' R2 D' L' D R2 D' L D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","RUF"],"algs":[{"a":"F D' R2 D F' D' F R2 F' D","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","DBR","RFD"],"algs":[{"a":"U F' R2 F U' F' U R2 U' F","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","DBR","BLU"],"algs":[{"a":"L' D B2 D' L D L' B2 L D'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","DBR","BDL"],"algs":[{"a":"U' L B2 L' U L U' B2 U L'","n":10,"m":"HTM","c":"Cyclic Shift"}]},{"s":["URB","DBR","LUB"],"algs":[{"a":"U2 F' U B2 U' F U B2 U","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","LFU"],"algs":[{"a":"D B2 D F' D' B2 D F D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","LBD"],"algs":[{"a":"D B2 D F D' B2 D F' D2","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","LDF"],"algs":[{"a":"U2 F U B2 U' F' U B2 U","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","DFL"],"algs":[{"a":"R2 U' R2 U' L2 U R2 U' L2 U2 R2","n":11,"m":"HTM","c":"Columns"}]},{"s":["URB","DBR","DRF"],"algs":[{"a":"U2 F2 U B2 U' F2 U B2 U","n":9,"m":"HTM","c":"A9"}]},{"s":["URB","DBR","DLB"],"algs":[{"a":"U2 L2 U' R2 U L2 U' R2 U'","n":9,"m":"HTM","c":"A9"}]}]},"edge":{"buffer":"UR","stk":["UB","UR","UF","UL","LU","LF","LD","LB","FU","FR","FD","FL","RU","RB","RD","RF","BU","BL","BD","BR","DF","DR","DB","DL"],"cases":[{"s":["UR","UB","UL"],"algs":[{"a":"B' L' E L U2 L' E' L U2 B","n":10,"m":"STM","c":"Setup into Drop and Catch"},{"a":"M2 U' M' U2 M U2 M' U2 M U' M2","n":11,"m":"STM","c":"Setup into SP9"},{"a":"M2 U M' U2 M U M2","n":7,"m":"STM","c":"SP7 for 3x3"}]},{"s":["UR","UB","UF"],"algs":[{"a":"F' R' E R U R' E' R U' F","n":10,"m":"STM","c":"Setup into Drop and Catch"},{"a":"y' M2 U' M' U2 M U2 M' U2 M U' M2 y","n":11,"m":"STM","c":"Setup into SP9"},{"a":"y' M2 U M' U2 M U M2 y","n":7,"m":"STM","c":"SP7 for 3x3"}]},{"s":["UR","UB","FU"],"algs":[{"a":"M F R' F' M' F R F'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","UB","FL"],"algs":[{"a":"R E2 R' U R E2 R' U'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"U' B E' B' U B E B'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","FR"],"algs":[{"a":"U' B' E B U B' E' B","n":8,"m":"STM","c":"Drop and Catch"},{"a":"F' M F R' F' M' F R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","FD"],"algs":[{"a":"S D S' U S D' S' U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","RF"],"algs":[{"a":"U' B E2 B' U B E2 B'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","RB"],"algs":[{"a":"U F' E2 F U F' E2 F U2","n":9,"m":"STM","c":"B9"},{"a":"U2 L' E L U L' E' L U","n":9,"m":"STM","c":"B9"}]},{"s":["UR","UB","RD"],"algs":[{"a":"U' M' D M U M' D' M","n":8,"m":"STM","c":"Drop and Catch"},{"a":"R E R' U R E' R' U'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UB","BR"],"algs":[{"a":"U F E' F' U F E F' U2","n":9,"m":"STM","c":"B9"},{"a":"U2 L E2 L' U L E2 L' U","n":9,"m":"STM","c":"B9"}]},{"s":["UR","UB","BL"],"algs":[{"a":"R' E2 R U R' E2 R U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","BD"],"algs":[{"a":"U' B E B' U B E' B'","n":8,"m":"STM","c":"Direct Insert"},{"a":"M' B R B' M B R' B'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","UB","LU"],"algs":[{"a":"L' B L S' L' B' L S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","UB","LB"],"algs":[{"a":"B L S' L' B' L S L'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"R E' R' U R E R' U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","LF"],"algs":[{"a":"U' B' E2 B U B' E2 B","n":8,"m":"STM","c":"Drop and Catch"},{"a":"R' E R U R' E' R U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","LD"],"algs":[{"a":"U' M' D' M U M' D M","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","DF"],"algs":[{"a":"M2 D R2 D' M2 D R2 D'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","UB","DL"],"algs":[{"a":"D' B2 D S2 D' B2 D S2","n":8,"m":"STM","c":"Toss Up"},{"a":"R2 D' M U2 M' D2 M U2 M' D' R2","n":11,"m":"STM","c":"Setup into B9"}]},{"s":["UR","UB","DR"],"algs":[{"a":"D' M2 D R2 D' M2 D R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UB","DB"],"algs":[{"a":"B2 D S2 D' B2 D S2 D'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"D2 M2 D R2 D' M2 D R2 D","n":9,"m":"STM","c":"B9"}]},{"s":["UR","UL","UB"],"algs":[{"a":"B R E' R' U2 R E R' U2 B'","n":10,"m":"STM","c":"Setup into Drop and Catch"},{"a":"M2 U M' U2 M U2 M' U2 M U M2","n":11,"m":"STM","c":"Setup into SP9"}]},{"s":["UR","UL","UF"],"algs":[{"a":"F' R' E R U2 R' E' R U2 F","n":10,"m":"STM","c":"Setup into Drop and Catch"},{"a":"F U2 L E' L' U2 L E L' F'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","UL","FU"],"algs":[{"a":"R' F R' S2 R F' R' S2 R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","UL","FL"],"algs":[{"a":"R E2 R' U2 R E2 R' U2","n":8,"m":"STM","c":"Drop and Catch"},{"a":"S R2 S' L' S R2 S' L","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UL","FR"],"algs":[{"a":"U2 L' E2 L U2 L' E2 L","n":8,"m":"STM","c":"Drop and Catch"},{"a":"R S' L2 S R' S' L2 S","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UL","FD"],"algs":[{"a":"S D S' U2 S D' S' U2","n":8,"m":"STM","c":"Drop and Catch"},{"a":"L2 S2 L' F L S2 L' F' L'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","UL","RF"],"algs":[{"a":"U2 L E' L' U2 L E L'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UL","RB"],"algs":[{"a":"U2 L' E L U2 L' E' L","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UL","RD"],"algs":[{"a":"R' E' R U2 R' E R U2","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UL","BU"],"algs":[{"a":"R B' R S2 R' B R S2 R2","n":9,"m":"STM","c":"A9"},{"a":"L2 S2 L B L' S2 L B' L","n":9,"m":"STM","c":"A9"}]},{"s":["UR","UL","BR"],"algs":[{"a":"U2 L E2 L' U2 L E2 L'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"R' S' L2 S R S' L2 S","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UL","BL"],"algs":[{"a":"R' E2 R U2 R' E2 R U2","n":8,"m":"STM","c":"Drop and Catch"},{"a":"S R2 S' L S R2 S' L'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UL","BD"],"algs":[{"a":"S D' S' U2  S D S' U2","n":8,"m":"STM","c":"Drop and Catch"},{"a":"R B R S2 R' B' R S2 R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","UL","LB"],"algs":[{"a":"R E' R' U2 R E R' U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UL","LF"],"algs":[{"a":"R' E R U2 R' E' R U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UL","LD"],"algs":[{"a":"U2 L E L' U2 L E' L'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UL","DF"],"algs":[{"a":"U M' U2 M U2 M' U2 M U","n":9,"m":"STM","c":"SP9"},{"a":"U M D2 M' U2 M D2 M' U","n":9,"m":"STM","c":"B9"}]},{"s":["UR","UL","DL"],"algs":[{"a":"y' U2 M' U2 M U2 M' U2 M y","n":8,"m":"STM","c":"Slice-Plane"},{"a":"y' M' U2 M U2 y","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"}]},{"s":["UR","UL","DR"],"algs":[{"a":"y M' U2 M U2 M' U2 M U2 y'","n":8,"m":"STM","c":"Slice-Plane"},{"a":"y U2 M' U2 M y'","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"}]},{"s":["UR","UL","DB"],"algs":[{"a":"U' M U2 M' U2 M U2 M' U'","n":9,"m":"STM","c":"SP9"},{"a":"U M U2 M' U","n":5,"m":"STM","c":"SP5 for 3x3"}]},{"s":["UR","UF","UB"],"algs":[{"a":"F' U R' E R U' R' E' R F","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","UF","UL"],"algs":[{"a":"F L E' L' U2 L E L' U2 F'","n":10,"m":"STM","c":"Setup into Drop and Catch"},{"a":"M2 U' M U2 M' U2 M U2 M' U' M2","n":11,"m":"STM","c":"Setup into SP9"}]},{"s":["UR","UF","FL"],"algs":[{"a":"R E2 R' U' R E2 R' U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","FR"],"algs":[{"a":"U2 L' E2 L U' L' E2 L U'","n":9,"m":"STM","c":"B9"},{"a":"R2 B M' B' R' B M B' R'","n":9,"m":"STM","c":"B9"}]},{"s":["UR","UF","FD"],"algs":[{"a":"U F E F' U' F E' F'","n":8,"m":"STM","c":"Direct Insert"},{"a":"S D S' U' S D' S' U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","RF"],"algs":[{"a":"U2 L E' L' U' L E L' U'","n":9,"m":"STM","c":"B9"},{"a":"F' L' S' L F' L' S L F2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","UF","RB"],"algs":[{"a":"U F' E2 F U' F' E2 F","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","RD"],"algs":[{"a":"R' E' R U' R' E R U","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UF","BU"],"algs":[{"a":"M' B' R B M B' R' B","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","UF","BR"],"algs":[{"a":"U F E' F' U' F E F'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","BL"],"algs":[{"a":"R' E2 R U' R' E2 R U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","BD"],"algs":[{"a":"S D' S U' S D S' U","n":8,"m":"STM","c":"Drop and Catch"},{"a":"B2 M' B' R B M B' R' B'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","UF","LU"],"algs":[{"a":"L F' L' S' L F L' S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","UF","LB"],"algs":[{"a":"R E' R' U' R E R' U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","LF"],"algs":[{"a":"R' E R U' R' E' R U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","LD"],"algs":[{"a":"U M D M' U' M D' M'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","UF","DF"],"algs":[{"a":"U M D2 M' U M D2 M'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UF","DL"],"algs":[{"a":"D F2 D' S2 D F2 D' S2","n":8,"m":"STM","c":"Toss Up"},{"a":"D' M2 D' R2 D M2 D' R2 D2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","UF","DR"],"algs":[{"a":"D M2 D' R2 D M2 D' R2","n":8,"m":"STM","c":"Drop and Catch"},{"a":"S D2 S' U' S D2 S' U","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","UF","DB"],"algs":[{"a":"D' R2 D M2 D' R2 D M2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FU","UB"],"algs":[{"a":"F R' F' M F R F' M'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FU","UL"],"algs":[{"a":"R2 S2 R F R' S2 R F' R","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FU","FL"],"algs":[{"a":"F' L S2 L' F L S2 L'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FU","FR"],"algs":[{"a":"R B' M2 B R B' M2 B R2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","FU","FD"],"algs":[{"a":"F2 D S D' F2 D S' D'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FU","RF"],"algs":[{"a":"F U' M2 U R U' M2 U R' F'","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","FU","RB"],"algs":[{"a":"B F R' F' M F R F' M' B'","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","FU","RD"],"algs":[{"a":"D' F2 D S D' F2 D S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FU","BU"],"algs":[{"a":"B2 M2 B R B' M2 B R' B","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FU","BR"],"algs":[{"a":"B' M2 B R B' M2 B R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FU","BL"],"algs":[{"a":"L2 F' L S2 L' F L S2 L","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FU","BD"],"algs":[{"a":"F R' F' M2 F R F' M2","n":8,"m":"STM","c":"Toss Up"},{"a":"D2 F2 D S D' F2 D S' D","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FU","LU"],"algs":[{"a":"S R' F R S' R' F' R","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FU","LB"],"algs":[{"a":"r E' R' U R E R' U' M","n":9,"m":"WTM","c":"Wide Setup into Drop and Catch"},{"a":"F' L' U2 L E L' U2 L E' F","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","FU","LF"],"algs":[{"a":"M' R' E R U R' E' R U' M","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","FU","LD"],"algs":[{"a":"D F2 D S D' F2 D S' D2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FU","DF"],"algs":[{"a":"F R' F' M' F R F' M","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FU","DL"],"algs":[{"a":"S2 R' F R S2 R'F' R","n":8,"m":"STM","c":"Toss Up"},{"a":"D M D R2 D' M' D R2 D2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FU","DR"],"algs":[{"a":"D' M D R2 D' M' D R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FU","DB"],"algs":[{"a":"D2 M D R2 D' M' D R2 D","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FL","UB"],"algs":[{"a":"U R E2 R' U' R E2 R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FL","UL"],"algs":[{"a":"U2 R E2 R' U2 R E2 R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FL","UF"],"algs":[{"a":"U' R E2 R' U R E2 R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FL","FU"],"algs":[{"a":"L S2 L' F' L S2 L' F","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FL","FR"],"algs":[{"a":"E' L2 E R' E' L2 E R","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","FL","FD"],"algs":[{"a":"L S2 L' F L S2 L' F'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FL","RF"],"algs":[{"a":"L' U2 L E' L' U2 L E","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FL","RB"],"algs":[{"a":"L' U2 L' E L U2 L' E' L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FL","RD"],"algs":[{"a":"S' R' F2 R S R' F2 R","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FL","BU"],"algs":[{"a":"F2 R' F M2 F' R F M2 F","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FL","BR"],"algs":[{"a":"L' U2 L E2 L' U2 L E2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FL","BL"],"algs":[{"a":"L' S' L2 S L2 S' L2 S L'","n":9,"m":"STM","c":"SP9"},{"a":"z y U' M' U2 M U2 M' U2 M U' y' z'","n":9,"m":"STM","c":"SP9"}]},{"s":["UR","FL","BD"],"algs":[{"a":"U' M U' L' U M' U' L U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FL","LU"],"algs":[{"a":"S R' F2 R S' R' F2 R","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FL","LB"],"algs":[{"a":"L' U2 L E L' U2 L E'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FL","LD"],"algs":[{"a":"E2 R E L E' R' E L' E","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FL","DF"],"algs":[{"a":"U' M2 U' L' U M2 U' L U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FL","DL"],"algs":[{"a":"S2 R' F2 R S2 R' F2 R","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FL","DR"],"algs":[{"a":"R E R2 E' R2 E R2 E' R","n":9,"m":"STM","c":"SP9"},{"a":"L' y M' U2 M U2 M' U2 M U2 y' L","n":10,"m":"STM","c":"Setup into Slice-Plane"}]},{"s":["UR","FL","DB"],"algs":[{"a":"U M2 U L' U' M2 U L U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FR","UB"],"algs":[{"a":"R' F' M F R F' M' F","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","UL"],"algs":[{"a":"L' E2 L U2 L' E2 L U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","UF"],"algs":[{"a":"U L' E2 L U L' E2 L U2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","FR","FU"],"algs":[{"a":"R B' M2 B R B' M2 B R2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","FR","FL"],"algs":[{"a":"F2 L S2 L' F2 L S2 L'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"L2 E2 L U2 L' E2 L U2 L","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FR","FD"],"algs":[{"a":"U M' U' R U M U' R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","RB"],"algs":[{"a":"E B U' B' E' B U B'","n":8,"m":"STM","c":"Toss Up"},{"a":"E' F U F' E' F U' F' E2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","FR","RD"],"algs":[{"a":"D' F D S D' F' D S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FR","BU"],"algs":[{"a":"R' F M2 F' R F M2 F'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","BR"],"algs":[{"a":"U R2 B M' B' R2 B M B' U'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","FR","BL"],"algs":[{"a":"E2 L U2 L' E2 L U2 L'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FR","BD"],"algs":[{"a":"U' M U R U' M' U R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","LU"],"algs":[{"a":"R' E' L E R E' L ' E","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","LB"],"algs":[{"a":"S' L S R S' L' S R'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"B2 E B U' B' E' B U B","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FR","LF"],"algs":[{"a":"E' F U F' E F U' F'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FR","LD"],"algs":[{"a":"R' E' L' E R E' L E","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","DF"],"algs":[{"a":"U' M2 U R U' M2 U R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FR","DL"],"algs":[{"a":"L' F2 L S2 L' F2 L S2","n":8,"m":"STM","c":"Toss Up"},{"a":"L E2 L U2 L' E2 L U2 L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FR","DR"],"algs":[{"a":"F R2 U M' U' R2 U M U' F'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","FR","DB"],"algs":[{"a":"U M2 U' R U M2 U' R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FD","UB"],"algs":[{"a":"U S D S' U' S D' S'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"F' R' F' M F R F' M' F2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FD","UL"],"algs":[{"a":"S' D' S U2 S' D S U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FD","UF"],"algs":[{"a":"F E F' U F E' F' U'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","FD","FU"],"algs":[{"a":"D S D' F2 D S' D' F2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FD","FL"],"algs":[{"a":"F L S2 L' F' L S2 L'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"U2 L' U' M' U L U' M U'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FD","FR"],"algs":[{"a":"R U M' U' R' U M U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FD","RF"],"algs":[{"a":"u U L' U' M' U L U' M u'","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"D S' U F' U' S U F U' D'","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","FD","RB"],"algs":[{"a":"E' R U M' U' R' U M u'","n":9,"m":"WTM","c":"Wide A9"},{"a":"F' E B U' B' E' B U B' F","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","FD","RD"],"algs":[{"a":"M' U M D' M' U' M D","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FD","BU"],"algs":[{"a":"M2 B' R B M2 B' R' B","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FD","BR"],"algs":[{"a":"R' U M' U' R U M U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FD","BL"],"algs":[{"a":"U2 L U' M' U L' U' M U'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FD","BD"],"algs":[{"a":"M' U M D2 M' U M D2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FD","LU"],"algs":[{"a":"S R' F' R S' R' F R","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FD","LB"],"algs":[{"a":"r E' R' U' R E R' U M","n":9,"m":"WTM","c":"Wide A9"},{"a":"E' R' U M' U' R U M U' E","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","FD","LF"],"algs":[{"a":"d S D' F D S' D' F' E'","n":9,"m":"WTM","c":"Wide A9"},{"a":"u U L U' M' U L' U' M u'","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"M' R' E R U' R' E' R U M","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","FD","LD"],"algs":[{"a":"M' U M D M' U' M D'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","FD","DL"],"algs":[{"a":"S2 R' F' R S2 R' F R","n":8,"m":"STM","c":"Toss Up"},{"a":"U2 L2 U' M' U L2 U' M U'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","FD","DR"],"algs":[{"a":"R2 U M' U' R2 U M U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","FD","DB"],"algs":[{"a":"M D' R2 D M' D' R2 D","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RF","UB"],"algs":[{"a":"B E2 B' U' B E2 B' U","n":8,"m":"STM","c":"Drop and Catch"},{"a":"U' L E' L' U' L E L' U2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","RF","UL"],"algs":[{"a":"L E' L' U2 L E L' U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RF","UF"],"algs":[{"a":"U L E' L' U L E L' U2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","RF","FU"],"algs":[{"a":"F' R E2 R' U' R E2 R' U F","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","RF","FL"],"algs":[{"a":"F' U F E F' U' F E'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RF","FD"],"algs":[{"a":"D S' U F' U' S U F U' D'","n":10,"m":"STM","c":"Setup into Toss Up"},{"a":"u M' U L' U' M U L U' u'","n":10,"m":"WTM","c":"Wide Setup into Toss Up"}]},{"s":["UR","RF","RB"],"algs":[{"a":"F' U F' E2 F U' F' E2 F2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RF","RD"],"algs":[{"a":"S' U F' U' S U F U'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RF","BU"],"algs":[{"a":"f' F' L F M F' L' F M' f","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"f U2 M' U' R2 U M U' R2 U' f'","n":10,"m":"WTM","c":"Wide Setup into Drop and Catch"},{"a":"S F' M F R F' M' F R' S'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","RF","BR"],"algs":[{"a":"F' U F E' F' U' F E","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RF","BL"],"algs":[{"a":"L2 E' L' U2 L E L' U2 L'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RF","BD"],"algs":[{"a":"S R F M' F' R' F M f'","n":9,"m":"WTM","c":"Wide A9"},{"a":"F D R2 D' M' D R2 D' M F'","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","RF","LU"],"algs":[{"a":"S U F' U' S' U F U'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RF","LB"],"algs":[{"a":"F' U F E2 F' U' F E2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RF","LF"],"algs":[{"a":"F2 L' S' L F2 L' S L","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RF","LD"],"algs":[{"a":"L' F2 L' S' L F2 L' S L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RF","DF"],"algs":[{"a":"F D' S2 D F' D' S2 D","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RF","DL"],"algs":[{"a":"D F D' S2 D F' D' S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RF","DR"],"algs":[{"a":"U2 S2 U' F' U S2 U' F U'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RF","DB"],"algs":[{"a":"D2 F D' S2 D F' D' S2 D'","n":9,"m":"STM","c":"A9"},{"a":"u M2 U L' U' M2 U L U' u'","n":10,"m":"WTM","c":"Wide Setup into Toss Up"}]},{"s":["UR","RB","UB"],"algs":[{"a":"U' L' E L U' L' E' L U2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","RB","UL"],"algs":[{"a":"L' E L U2 L' E' L U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RB","UF"],"algs":[{"a":"F' E2 F U F' E2 F U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RB","FU"],"algs":[{"a":"b B L' B' M' B L B' M b'","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"b' U2 M U R2 U' M' U R2 U b","n":10,"m":"WTM","c":"Wide Setup into Drop and Catch"},{"a":"S B M' B' R' B M B' R S'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","RB","FL"],"algs":[{"a":"L2 E L U2 L' E' L U2 L","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RB","FR"],"algs":[{"a":"B U' B E B U B E'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RB","FD"],"algs":[{"a":"u M' U' R U M U' R' E","n":9,"m":"WTM","c":"Wide A9"},{"a":"F' B U' B' E B U B' E' F","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","RB","RF"],"algs":[{"a":"F2 E2 F U F' E2 F U' F","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RB","RD"],"algs":[{"a":"S' U' B U S U' B' U","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RB","BU"],"algs":[{"a":"E' R' F M2 F' R F M2 F' E","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","RB","BL"],"algs":[{"a":"E L U2 L' E' L U2 L'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RB","BD"],"algs":[{"a":"D' S' U' B U S U' B' U D","n":10,"m":"STM","c":"Setup into Toss Up"},{"a":"u' M U' L U M' U' L' U u","n":10,"m":"WTM","c":"Wide Setup into Toss Up"}]},{"s":["UR","RB","LU"],"algs":[{"a":"S U' B U S' U' B' U","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RB","LB"],"algs":[{"a":"B2 L S' L' B2 L S L'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RB","LF"],"algs":[{"a":"E2 F U F' E2 F U' F'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RB","LD"],"algs":[{"a":"L B2 L S' L' B2 L S L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RB","DF"],"algs":[{"a":"D2 B' D S2 D' B D S2 D","n":9,"m":"STM","c":"A9"},{"a":"u' M2 U' L U M2 U' L' U u","n":10,"m":"WTM","c":"Wide Setup into Toss Up"}]},{"s":["UR","RB","DL"],"algs":[{"a":"D' B' D S2 D' B D S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RB","DR"],"algs":[{"a":"D B' D S2 D' B D S2 D2","n":9,"m":"STM","c":"A9"},{"a":"B' R2 U M2 U' R2 U M2 U' B","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","RB","DB"],"algs":[{"a":"B' D S2 D' B D S2 D'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RD","UB"],"algs":[{"a":"M' D M U' M' D' M U","n":8,"m":"STM","c":"Drop and Catch"},{"a":"U R' E' R U' R' E R","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","RD","UL"],"algs":[{"a":"U2 R' E' R U2 R' E R","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","RD","UF"],"algs":[{"a":"M D' M' U M D M' U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","RD","FU"],"algs":[{"a":"S D' F2 D S' D' F2 D","n":8,"m":"STM","c":"A9"},{"a":"M2 D M U' M' D' M U M","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RD","FL"],"algs":[{"a":"R' F2 R S' R' F2 R S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","FR"],"algs":[{"a":"S D' F D S' D' F' D","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","FD"],"algs":[{"a":"D' M' U M D M' U' M","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","RF"],"algs":[{"a":"U F' U' S' U F U' S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","RB"],"algs":[{"a":"U' B U S' U' B' U S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","BU"],"algs":[{"a":"R B' R' S' R B R' S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","BR"],"algs":[{"a":"S D B' D' S' D B D'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","BL"],"algs":[{"a":"R B2 R' S' R B2 R' S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","BD"],"algs":[{"a":"D M U' M' D' M U M'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","LU"],"algs":[{"a":"U2 R2 U M U' R2 U M' U","n":9,"m":"STM","c":"A9"},{"a":"R' E R' U2 R E' R' U2 R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RD","LB"],"algs":[{"a":"U' B' U S' U' B U S","n":8,"m":"STM","c":"Toss Up"},{"a":"S R' B2 R S' R' B2 R","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","LF"],"algs":[{"a":"U F U' S' U F' U' S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","LD"],"algs":[{"a":"R' E R D2 R' E' R D2","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","RD","DF"],"algs":[{"a":"U F2 U' S' U F2 U' S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","RD","DL"],"algs":[{"a":"D' M D' R2 D M' D' R2 D2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","RD","DB"],"algs":[{"a":"U' B2 U S' U' B2 U S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BU","UL"],"algs":[{"a":"L' B L' S2 L B' L' S2 L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BU","UF"],"algs":[{"a":"B' R B M' B' R' B M","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BU","FU"],"algs":[{"a":"B' R B' M2 B R' B' M2 B2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BU","FL"],"algs":[{"a":"L2 B L' S2 L B' L' S2 L'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BU","FR"],"algs":[{"a":"F M2 F' R' F M2 F' R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BU","FD"],"algs":[{"a":"B' R B M2 B' R' B M2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BU","RF"],"algs":[{"a":"S F' M F R F' M' F R' S'","n":10,"m":"STM","c":"Setup into Drop and Catch"},{"a":"f' M F' L F M' F' L' F f","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"f U2 M' U' R2 U M U' R2 U' f'","n":11,"m":"STM","c":"Wide Setup into A9"}]},{"s":["UR","BU","RB"],"algs":[{"a":"U R B' M2 B R' B' M2 B U'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","BU","RD"],"algs":[{"a":"D B2 D' S D B2 D' S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BU","BR"],"algs":[{"a":"R2 F M2 F' R F M2 F' R","n":9,"m":"STM","c":"B9"}]},{"s":["UR","BU","BL"],"algs":[{"a":"B L' S2 L B' L' S2 L","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BU","BD"],"algs":[{"a":"B2 D' S D B2 D' S' D","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BU","LU"],"algs":[{"a":"S R B' R' S' R B R'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BU","LB"],"algs":[{"a":"R L U' L' E L U L' E' R'","n":10,"m":"STM","c":"Setup into Toss Up"},{"a":"l L F' L' S' L F L' S l'","n":10,"m":"WTM","c":"Wide Setup into Toss Up"}]},{"s":["UR","BU","LF"],"algs":[{"a":"r' E R U' R' E' R U M'","n":9,"m":"WTM","c":"Wide A9"},{"a":"M R' E R U' R' E' R U M'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","BU","LD"],"algs":[{"a":"M U M D M' U' M D' M2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BU","DF"],"algs":[{"a":"B' R B' M B R' B' M' B2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BU","DL"],"algs":[{"a":"L B L' S2 L B' L' S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BU","DR"],"algs":[{"a":"D M' D' R2 D M D' R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BU","DB"],"algs":[{"a":"M' D' R2 D M D' R2 D","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BR","UB"],"algs":[{"a":"U2 F E' F' U' F E F' U'","n":9,"m":"STM","c":"B9"}]},{"s":["UR","BR","UL"],"algs":[{"a":"L E2 L' U2 L E2 L' U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BR","UF"],"algs":[{"a":"F E' F' U F E F' U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BR","FU"],"algs":[{"a":"R B' M2 B R' B' M2 B","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BR","FL"],"algs":[{"a":"E2 L' U2 L E2 L' U2 L","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BR","FR"],"algs":[{"a":"U' R2 F' M F R2 F' M' F U","n":10,"m":"STM","c":"Setup into Drop and Catch"},{"a":"S2 R' S' R2 S R' S2","n":7,"m":"STM","c":"SP7 for 3x3"}]},{"s":["UR","BR","FD"],"algs":[{"a":"U M' U' R' U M U' R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BR","RF"],"algs":[{"a":"E' F' U F E F' U' F","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BR","RD"],"algs":[{"a":"D B' D' S D B D' S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BR","BU"],"algs":[{"a":"R' F M2 F' R' F M2 F' R2","n":9,"m":"STM","c":"B9"}]},{"s":["UR","BR","BL"],"algs":[{"a":"R E L2 E' R' E L2 E'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","BR","BD"],"algs":[{"a":"U' M U R' U' M' U R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BR","LU"],"algs":[{"a":"U' M' U R' U' M U R","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","BR","LB"],"algs":[{"a":"R B M B' R' B M' B'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","BR","LF"],"algs":[{"a":"S' L' S R' S' L S R","n":8,"m":"STM","c":"Drop and Catch"},{"a":"F2 E' F' U F E F' U F'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BR","LD"],"algs":[{"a":"R E L E' R' E L' E'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BR","DF"],"algs":[{"a":"U' M2 U R' U' M2 U R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BR","DL"],"algs":[{"a":"L B2 L' S2 L B2 L' S2","n":8,"m":"STM","c":"Toss Up"},{"a":"L' E2 L' U2 L E2 L' U2 L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BR","DR"],"algs":[{"a":"D' U' M2 U R' U' M2 U R D","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","BR","DB"],"algs":[{"a":"U M2 U' R' U M2 U' R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BL","UB"],"algs":[{"a":"U R' E2 R U' R' E2 R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BL","UL"],"algs":[{"a":"U2 R' E2 R U2 R' E2 R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BL","UF"],"algs":[{"a":"U' R' E2 R U R' E2 R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BL","FU"],"algs":[{"a":"L' S2 L' F' L S2 L' F L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BL","FL"],"algs":[{"a":"L S' L2 S L2 S' L2 S L","n":9,"m":"STM","c":"SP9"},{"a":"L' y' M' U2 M U2 M' U2 M U2 y L","n":10,"m":"STM","c":"Setup into Slice-Plane"}]},{"s":["UR","BL","FR"],"algs":[{"a":"L U2 L' E2 L U2 L' E2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BL","FD"],"algs":[{"a":"U M' U L U' M U L' U2","n":9,"m":"STM","c":"A9"},{"a":"L' S2 L' F L S2 L' F' L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BL","RF"],"algs":[{"a":"F2 E F U F' E' F U' F","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BL","RB"],"algs":[{"a":"L U2 L' E L U2 L' E'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BL","RD"],"algs":[{"a":"S' R B2 R' S R B2 R'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BL","BU"],"algs":[{"a":"L' S2 L B L' S2 L B'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BL","BR"],"algs":[{"a":"L' S2 L B2 L' S2 L B2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BL","BD"],"algs":[{"a":"L' S2 L B' L' S2 L B","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BL","LU"],"algs":[{"a":"S R B2 R' S' R B2 R'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BL","LF"],"algs":[{"a":"L U2 L' E' L U2 L' E","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BL","LD"],"algs":[{"a":"E2 R' E' L' E R E' L E'","n":9,"m":"STM","c":"A9"},{"a":"R2 S' R' B2 R S R' B2 R'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BL","DF"],"algs":[{"a":"U' M2 U' L U M2 U' L' U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BL","DL"],"algs":[{"a":"S2 R B2 R' S2 R B2 R'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BL","DR"],"algs":[{"a":"R' E' R2 E R2 E' R2 E R'","n":9,"m":"STM","c":"SP9"},{"a":"L y M' U2 M U2 M' U2 M U2 y' L'","n":10,"m":"STM","c":"Setup into Slice-Plane"}]},{"s":["UR","BL","DB"],"algs":[{"a":"U M2 U L U' M2 U L' U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BD","UB"],"algs":[{"a":"B' E' B U' B' E B U","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","BD","UL"],"algs":[{"a":"S' D S U2 S' D' S U2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BD","UF"],"algs":[{"a":"U' S D' S' U S D S'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"B R B M' B' R' B M B2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BD","FU"],"algs":[{"a":"M2 F R' F' M2 F R F'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BD","FL"],"algs":[{"a":"U2 L' U M U' L U M' U","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BD","FR"],"algs":[{"a":"F' M2 F R' F' M2 F R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BD","FD"],"algs":[{"a":"D2 M' U M D2 M' U' M","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BD","RF"],"algs":[{"a":"f M' F' R F M F' R' S'","n":9,"m":"WTM","c":"Wide A9"},{"a":"u' U R' U' M U R U' M' u","n":10,"m":"STM","c":"Wide Setup into Toss Up"},{"a":"S F M' F' R F M F' R' S'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","BD","RB"],"algs":[{"a":"u' U' L U M U' L' U M' u","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"D' U' B U S' U' B' U S D","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","BD","RD"],"algs":[{"a":"M U' M' D M U M' D'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BD","BU"],"algs":[{"a":"D' S D B2 D' S' D B2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BD","BR"],"algs":[{"a":"R' U' M U R U' M' U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","BD","BL"],"algs":[{"a":"B' L' S2 L B L' S2 L","n":8,"m":"STM","c":"Drop and Catch"},{"a":"U2 L U M U' L' U M' U","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BD","LU"],"algs":[{"a":"S R B R' S' R B' R'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BD","LB"],"algs":[{"a":"d' S D B' D' S' D B E","n":9,"m":"WTM","c":"Wide A9"},{"a":"u' U' L' U M U' L U M' u","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"M R E' R' U R E R' U' M'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","BD","LF"],"algs":[{"a":"r' E R U R' E' R U' M'","n":9,"m":"WTM","c":"Wide A9"},{"a":"E R U' M U R' U' M' U E'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","BD","LD"],"algs":[{"a":"M U' M' D' M U M' D","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BD","DF"],"algs":[{"a":"M' D R2 D' M D R2 D'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","BD","DL"],"algs":[{"a":"S2 R B R' S2 R B' R'","n":8,"m":"STM","c":"Toss Up"},{"a":"U2 L2 U M U' L2 U M' U","n":9,"m":"STM","c":"A9"}]},{"s":["UR","BD","DR"],"algs":[{"a":"R2 U' M U R2 U' M' U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LU","UB"],"algs":[{"a":"S' L' B L S L' B' L","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","UF"],"algs":[{"a":"S' L F' L' S L F L'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","FU"],"algs":[{"a":"R' F R S R' F' R S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","FL"],"algs":[{"a":"R' F2 R S R' F2 R S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","FR"],"algs":[{"a":"S' U' F' U S U' F U","n":8,"m":"STM","c":"Toss Up"},{"a":"F R' F' R S R' F R f'","n":9,"m":"WTM","c":"Wide A9"}]},{"s":["UR","LU","FD"],"algs":[{"a":"R' F' R S R' F R S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","RF"],"algs":[{"a":"S' L F2 L' S L F2 L'","n":8,"m":"STM","c":"Toss Up"},{"a":"U M' U R U' M U R' U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LU","RB"],"algs":[{"a":"S' L' B2 L S L' B2 L","n":8,"m":"STM","c":"Toss Up"},{"a":"U M' U R' U' M U R U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LU","RD"],"algs":[{"a":"U M' U R2 U' M U R2 U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LU","BU"],"algs":[{"a":"R B' R' S R B R' S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","BR"],"algs":[{"a":"R' U' M' U R U' M U","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LU","BL"],"algs":[{"a":"R B2 R' S R B2 R' S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","BD"],"algs":[{"a":"R B R' S R B' R' S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","LB"],"algs":[{"a":"U M' U' L U M U' L'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LU","LF"],"algs":[{"a":"U M' U' L' U M U' L","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LU","LD"],"algs":[{"a":"U M' U' L2 U M U' L2","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LU","DF"],"algs":[{"a":"S' L F L' S L F' L'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LU","DL"],"algs":[{"a":"L' E L' U2 L E' L' U2 L2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LU","DR"],"algs":[{"a":"R2 U' M' U R2 U' M U","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LU","DB"],"algs":[{"a":"S' L' B' L S L' B L","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LB","UB"],"algs":[{"a":"U R E' R' U' R E R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LB","UL"],"algs":[{"a":"U2 R E' R' U2 R E R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LB","UF"],"algs":[{"a":"U' R E' R' U R E R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LB","FU"],"algs":[{"a":"M' U  R E' R' U' R E r'","n":9,"m":"WTM","c":"Wide A9"},{"a":"M' U  R E' R' U' R E R' M","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","LB","FL"],"algs":[{"a":"E L' U2 L E' L' U2 L","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LB","FR"],"algs":[{"a":"R S' L S R' S' L' S","n":8,"m":"STM","c":"Drop and Catch"},{"a":"B' U' B' E B U B' E' B2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LB","FD"],"algs":[{"a":"M' U' R E' R' U R E r'","n":9,"m":"WTM","c":"Wide A9"},{"a":"u M' U' R' U M U' R U u'","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"M' U' R E' R' U R E R' M","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","LB","RF"],"algs":[{"a":"E2 F' U F E2 F' U' F","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LB","RB"],"algs":[{"a":"L S' L' B2 L S L' B2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LB","RD"],"algs":[{"a":"R' B2 R S R' B2 R S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LB","BU"],"algs":[{"a":"R E L U' L' E' L U L' R'","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","LB","BR"],"algs":[{"a":"B' M' B R B' M B R'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LB","BD"],"algs":[{"a":"E' B' D' S D B D' S' d","n":9,"m":"WTM","c":"Wide A9"},{"a":"E' U' M U R' U' M' U R E","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","LB","LU"],"algs":[{"a":"L U M' U' L' U M U","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LB","LF"],"algs":[{"a":"E' R E L2 E' R' E L2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LB","LD"],"algs":[{"a":"E' R E L E' R' E L'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LB","DF"],"algs":[{"a":"F' E2 F' U F E2 F' U' F2","n":9,"m":"STM","c":"A9"},{"a":"u' M2 U' L' U M2 U' L U u","n":10,"m":"STM","c":"Wide Setup into Toss Up"}]},{"s":["UR","LB","DL"],"algs":[{"a":"S2 U' B' U S2 U' B U","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LB","DR"],"algs":[{"a":"R2 S' L S R2 S' L' S","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LB","DB"],"algs":[{"a":"L S' L' B' L S L' B","n":8,"m":"STM","c":"Drop and Catch"},{"a":"u M2 U' R' U M2 U' R U u'","n":10,"m":"STM","c":"Wide Setup into Toss Up"}]},{"s":["UR","LF","UB"],"algs":[{"a":"U R' E R U' R' E' R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LF","UL"],"algs":[{"a":"U2 R' E R U2 R' E' R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LF","UF"],"algs":[{"a":"U' R' E R U R' E' R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LF","FU"],"algs":[{"a":"R' E' L' U L E L' U' L R","n":10,"m":"STM","c":"Setup into Toss Up"}]},{"s":["UR","LF","FR"],"algs":[{"a":"F M F' R' F M' F' R","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LF","FD"],"algs":[{"a":"E F D S D' F' D S' d'","n":9,"m":"WTM","c":"Wide A9"},{"a":"E U M' U' R U M U' R' E'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","LF","RF"],"algs":[{"a":"L' S' L B2 L' S L F2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LF","RB"],"algs":[{"a":"E2 B U' B' E2 B U B'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LF","RD"],"algs":[{"a":"R F2 R' S R F2 R' S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LF","BU"],"algs":[{"a":"M U'  R' E R U R' E' r","n":9,"m":"WTM","c":"Wide A9"},{"a":"M U'  R' E R U R' E' R M'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","LF","BR"],"algs":[{"a":"R' S' L' S R S' L S","n":8,"m":"STM","c":"Drop and Catch"},{"a":"F U F E' F' U' F E F2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LF","BL"],"algs":[{"a":"E' L U2 L' E L U2 L'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LF","BD"],"algs":[{"a":"M U R' E R U' R' E' r","n":9,"m":"WTM","c":"Wide A9"},{"a":"u' M U R U' M' U R' U' u","n":10,"m":"WTM","c":"Wide Setup into Toss Up"},{"a":"M U R' E R U' R' E' R M'","n":10,"m":"STM","c":"Wide Setup into Toss Up"}]},{"s":["UR","LF","LU"],"algs":[{"a":"L' U' M U L U' M' U'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LF","LB"],"algs":[{"a":"E R' E' L2 E R E' L2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LF","LD"],"algs":[{"a":"E R' E' L' E R E' L","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LF","DF"],"algs":[{"a":"L' S' L F L' S L F'","n":8,"m":"STM","c":"Drop and Catch"},{"a":"u' M2 U R U' M2 U R' U' u","n":10,"m":"STM","c":"Wide Setup into Toss Up"}]},{"s":["UR","LF","DL"],"algs":[{"a":"S2 U F U' S2 U F' U'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LF","DR"],"algs":[{"a":"R2 S' L' S R2 S' L S","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LF","DB"],"algs":[{"a":"B E2 B U' B' E2 B U B2","n":9,"m":"STM","c":"A9"},{"a":"u M2 U L U' M2 U L' U' u'","n":10,"m":"STM","c":"Wide Setup into Toss Up"}]},{"s":["UR","LD","UB"],"algs":[{"a":"M' D' M U' M' D M U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LD","UL"],"algs":[{"a":"L E L' U2 L E' L' U2","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LD","UF"],"algs":[{"a":"M D M' U M D' M' U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LD","FU"],"algs":[{"a":"R' F R' S' R F' R' S R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LD","FL"],"algs":[{"a":"R' F2 R' S' R F2 R' S R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LD","FR"],"algs":[{"a":"E' L' E R' E' L E R","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LD","FD"],"algs":[{"a":"D M' U M D' M' U' M","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LD","RF"],"algs":[{"a":"U F' U S U' F U S' U2","n":9,"m":"STM","c":"A9"},{"a":"d R' U M' U' R U M U' d'","n":10,"m":"STM","c":"Wide Setup into Drop and Catch"}]},{"s":["UR","LD","RB"],"algs":[{"a":"U' B U' S U B' U' S' U2","n":9,"m":"STM","c":"A9"},{"a":"d' R U' M U R' U' M' U d","n":10,"m":"STM","c":"Wide Setup into Drop and Catch"}]},{"s":["UR","LD","RD"],"algs":[{"a":"D2 R' E R D2 R' E' R","n":8,"m":"STM","c":"Direct Insert"},{"a":"D M' U M D2 M' U' M D","n":9,"m":"STM","c":"B9"}]},{"s":["UR","LD","BU"],"algs":[{"a":"R B' R S' R' B R S R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LD","BR"],"algs":[{"a":"E L E' R E L' E' R'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LD","BL"],"algs":[{"a":"R B2 R S' R' B2 R S R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LD","BD"],"algs":[{"a":"D' M U' M' D M U M'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","LD","LU"],"algs":[{"a":"L2 U M' U' L2 U M U'","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LD","LB"],"algs":[{"a":"L E' R E L' E' R' E","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LD","LF"],"algs":[{"a":"L' E R' E' L E R E'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","LD","DF"],"algs":[{"a":"M D' M U' M' D M U M2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","LD","DR"],"algs":[{"a":"D' M' D R2 D' M D R2","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","LD","DB"],"algs":[{"a":"M' D M' U M D' M' U' M2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DF","UB"],"algs":[{"a":"D R2 D' M2 D R2 D' M2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DF","UL"],"algs":[{"a":"U' M' U2 M U2 M' U2 M U'","n":9,"m":"STM","c":"SP9"},{"a":"U M' U2 M U","n":5,"m":"STM","c":"SP5 for 3x3"}]},{"s":["UR","DF","UF"],"algs":[{"a":"D' S2 D F2 D' S2 D F2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DF","FU"],"algs":[{"a":"F2 U F E F' U' F E' F","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DF","FL"],"algs":[{"a":"U2 L' U M2 U' L U M2 U","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DF","FR"],"algs":[{"a":"R U' M2 U R' U' M2 U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DF","RF"],"algs":[{"a":"E R' U' M2 U R U' M2 u","n":9,"m":"WTM","c":"Wide A9"},{"a":"E R' U' M2 U R U' M2 U E'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","DF","RB"],"algs":[{"a":"D' S2 D' B' D S2 D' B D2","n":9,"m":"STM","c":"A9"},{"a":"u' U' L U M2 U' L' U M2 u","n":10,"m":"WTM","c":"Wide Setup into Toss Up"}]},{"s":["UR","DF","RD"],"algs":[{"a":"M2 U' M' D M U M' D' M'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DF","BU"],"algs":[{"a":"B2 M B R B' M' B R' B","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DF","BR"],"algs":[{"a":"R' U' M2 U R U' M2 U","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DF","BL"],"algs":[{"a":"R' E2 R' D R E2 R D' R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DF","BD"],"algs":[{"a":"D R2 D' M' D R2 D' M","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DF","LU"],"algs":[{"a":"L F L' S' L F' L' S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DF","LB"],"algs":[{"a":"D' S2 D' B D S2 D' B' D2","n":9,"m":"STM","c":"A9"},{"a":"u' U' L' U M2 U' L U M2 u","n":10,"m":"STM","c":"Wide Setup into Toss Up"}]},{"s":["UR","DF","LF"],"algs":[{"a":"F L' S' L F' L' S L","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DF","LD"],"algs":[{"a":"M2 U' M' D' M U M' D M'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DF","DL"],"algs":[{"a":"S2 U F2 U' S2 U F2 U'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DF","DR"],"algs":[{"a":"R2 U' M2 U R2 U' M2 U","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DF","DB"],"algs":[{"a":"D S' U2 S D2 S' U2 S D","n":9,"m":"STM","c":"B9"},{"a":"U M' U2 M D2 M' U2 M D2 U'","n":10,"m":"STM","c":"Setup into Direct Insert"}]},{"s":["UR","DL","UB"],"algs":[{"a":"S2 D' B2 D S2 D' B2 D","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","UL"],"algs":[{"a":"S U2 S' U2 S U2 S' U2","n":8,"m":"STM","c":"Slice-Plane"},{"a":"y' M' U2 M U2 M' U2 M U2 y","n":8,"m":"STM","c":"Slice-Plane"},{"a":"U2 S U2 S'","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"},{"a":"y' U2 M' U2 M y","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"}]},{"s":["UR","DL","UF"],"algs":[{"a":"S2 D F2 D' S2 D F2 D'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","FU"],"algs":[{"a":"R' F R S2 R' F' R S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","FL"],"algs":[{"a":"R' F2 R S2 R' F2 R S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","FR"],"algs":[{"a":"S2 L' F2 L S2 L' F2 L","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","FD"],"algs":[{"a":"R' F' R S2 R' F R S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","RF"],"algs":[{"a":"U F' U' S2 U F U' S2","n":8,"m":"STM","c":"Toss Up"},{"a":"L2 U2 L E' L' U2 L E L","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DL","RB"],"algs":[{"a":"U' B U S2 U' B' U S2","n":8,"m":"STM","c":"Toss Up"},{"a":"L2 U2 L' E L U2 L' E' L'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DL","RD"],"algs":[{"a":"D2 R2 D' M' D R2 D' M D'","n":9,"m":"STM","c":"A9"},{"a":"R E R D2 R' E' R D2 R2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DL","BU"],"algs":[{"a":"R B' R' S2 R B R' S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","BR"],"algs":[{"a":"S2 L B2 L' S2 L B2 L'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","BL"],"algs":[{"a":"R B2 R' S2 R B2 R' S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","BD"],"algs":[{"a":"R B R' S2 R B' R' S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","LU"],"algs":[{"a":"L2 U2 L E L' U2 L E' L","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DL","LB"],"algs":[{"a":"U' B' U S2 'U B U S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","LF"],"algs":[{"a":"U F U' S2 U F' U' S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DL","DF"],"algs":[{"a":"U F2 U' S2 U F2 U' S2","n":8,"m":"STM","c":"Toss Up"},{"a":"U' M2 U' L2 U M2 U' L2 U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DL","DR"],"algs":[{"a":"S' R2 S R2 S' R2 S R2","n":8,"m":"STM","c":"Slice-Plane"},{"a":"y D2 M' U2 M D2 M' U2 M y'","n":8,"m":"STM","c":"Slice-Plane"},{"a":"R2 S' R2 S","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"}]},{"s":["UR","DL","DB"],"algs":[{"a":"U' B2 U S2 U' B2 U S2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DR","UB"],"algs":[{"a":"R2 D' M2 D R2 D' M2 D","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","UL"],"algs":[{"a":"U2 S' U2 S U2 S' U2 S","n":8,"m":"STM","c":"Slice-Plane"},{"a":"y U2 M' U2 M U2 M' U2 M y'","n":8,"m":"STM","c":"Slice-Plane"},{"a":"R2 S R2 S'","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"},{"a":"y M' U2 M U2 y'","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"}]},{"s":["UR","DR","UF"],"algs":[{"a":"R2 D M2 D' R2 D M2 D'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","FU"],"algs":[{"a":"R2 D' M D R2 D' M' D","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","FL"],"algs":[{"a":"R' E R2 E' R2 E R2 E' R'","n":9,"m":"STM","c":"SP9"},{"a":"L' y U2 M' U2 M U2 M' U2 M y' L","n":10,"m":"STM","c":"Setup into Slice-Plane"}]},{"s":["UR","DR","FR"],"algs":[{"a":"F U M' U' R2 U M U' R2 F'","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","DR","FD"],"algs":[{"a":"U M' U' R2 U M U' R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","RF"],"algs":[{"a":"U F' U S2 U' F U S2 U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DR","RB"],"algs":[{"a":"U' B U' S2 U B' U' S2 U2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DR","BU"],"algs":[{"a":"R2 D M' D' R2 D M D'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","BR"],"algs":[{"a":"B' U' M U R2 U' M' U R2 B","n":10,"m":"STM","c":"Setup into Drop and Catch"}]},{"s":["UR","DR","BL"],"algs":[{"a":"R E' R2 E R2 E' R2 E R","n":9,"m":"STM","c":"SP9"},{"a":"L y U2 M' U2 M U2 M' U2 M y' L'","n":10,"m":"STM","c":"Setup into Slice-Plane"}]},{"s":["UR","DR","BD"],"algs":[{"a":"U' M U R2 U' M' U R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","LU"],"algs":[{"a":"U' M' U R2 U' M U R2","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","DR","LB"],"algs":[{"a":"S' L S R2 S' L' S R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","LF"],"algs":[{"a":"S' L' S R2 S' L S R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","LD"],"algs":[{"a":"R2 D' M' D R2 D' M D","n":8,"m":"STM","c":"Direct Insert"}]},{"s":["UR","DR","DF"],"algs":[{"a":"U' M2 U R2 U' M2 U R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DR","DL"],"algs":[{"a":"S' U2 S D2 S' U2 S D2","n":8,"m":"STM","c":"Slice-Plane"},{"a":"y M' U2 M D2 M' U2 M D2 y'","n":8,"m":"STM","c":"Slice-Plane"},{"a":"S' R2 S R2","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"},{"a":"y x M' U2 M U2 x' y'","n":4,"m":"STM","c":"Half Slice-Plane for 3x3"}]},{"s":["UR","DR","DB"],"algs":[{"a":"U M2 U' R2 U M2 U' R2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DB","UB"],"algs":[{"a":"D S2 D' B2 D S2 D' B2","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DB","UL"],"algs":[{"a":"U M U2 M' U2 M U2 M' U","n":9,"m":"STM","c":"SP9"}]},{"s":["UR","DB","UF"],"algs":[{"a":"D' R2 D M2 D' R2 D M2","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DB","FU"],"algs":[{"a":"F2 M' F' R' F M F' R F'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DB","FL"],"algs":[{"a":"U2 L' U' M2 U L U' M2 U'","n":8,"m":"STM","c":"A9"}]},{"s":["UR","DB","FR"],"algs":[{"a":"R U M2 U' R' U M2 U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DB","FD"],"algs":[{"a":"D' R2 D M D' R2 D M'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DB","RF"],"algs":[{"a":"D S2 D F D' S2 D F' D2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DB","RB"],"algs":[{"a":"D S2 D' B' D S2 D' B","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DB","RD"],"algs":[{"a":"R' B R S R' B' R S'","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DB","BU"],"algs":[{"a":"D' R2 D M' D' R2 D M","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DB","BR"],"algs":[{"a":"R' U M2 U' R U M2 U'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DB","BL"],"algs":[{"a":"U2 L U' M2 U L' U' M2 U'","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DB","LU"],"algs":[{"a":"L' B' L S' L' B L S","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DB","LB"],"algs":[{"a":"B' L S' L' B L S L'","n":8,"m":"STM","c":"Drop and Catch"}]},{"s":["UR","DB","LF"],"algs":[{"a":"D S2 D F' D' S2 D F D2","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DB","LD"],"algs":[{"a":"M2 U M D M' U' M D' M","n":9,"m":"STM","c":"A9"}]},{"s":["UR","DB","DF"],"algs":[{"a":"D' S D2 S' D2 S D2 S' D'","n":9,"m":"STM","c":"SP9"}]},{"s":["UR","DB","DL"],"algs":[{"a":"S2 U' B2 U S2 U' B2 U","n":8,"m":"STM","c":"Toss Up"}]},{"s":["UR","DB","DR"],"algs":[{"a":"R2 U M2 U' R2 U M2 U'","n":8,"m":"STM","c":"Drop and Catch"}]}]}};</script>
+<script>
+(function(){
+"use strict";
+var D = window.__BH_DATA__;
+var ABC = "ABCDEFGHIJKLMNOPQRSTUVWX";
+var NUM = ["①","②","③","④"];
+
+var FAM = {
+  di:  {label:"Direct Insert",  tag:"tag-di"},
+  dc:  {label:"Drop and Catch", tag:"tag-pure"},
+  a9:  {label:"A9",             tag:"tag-a9"},
+  b9:  {label:"B9",             tag:"tag-b9"},
+  orth:{label:"Orthogonals",    tag:"tag-orth"},
+  col: {label:"Columns",        tag:"tag-col"},
+  cyc: {label:"Cyclic Shift",   tag:"tag-cyc"},
+  ps:  {label:"Per Special",    tag:"tag-ps"},
+  toss:{label:"Toss Up",        tag:"tag-toss"},
+  sp:  {label:"Slice-Plane",    tag:"tag-sp"},
+  other:{label:"Other",         tag:"tag-other"}
+};
+var FACE = {U:"--fU",D:"--fD",F:"--fF",B:"--fB",R:"--fR",L:"--fL"};
+var FCACHE = {};
+
+function $(s){return document.querySelector(s);}
+
+/* ---------- storage ---------- */
+function get(k,d){try{var v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}}
+function set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+/* ---------- scheme ---------- */
+/* 编码单元按“码点”计，汉字、字母、数字、emoji 均可 */
+function normScheme(v){ return Array.from(String(v==null?"":v)).filter(function(c){ return !/\s/.test(c); }).slice(0,24).join(""); }
+function validScheme(s){ if(typeof s!=="string") return false; var a = Array.from(s); return a.length===24 && new Set(a).size===24; }
+function findIdx(arr,ch){
+  var p = arr.indexOf(ch); if(p>=0) return p;
+  var u = ch.toUpperCase(); if(u!==ch){ p = arr.indexOf(u); if(p>=0) return p; }
+  var l = ch.toLowerCase(); if(l!==ch){ p = arr.indexOf(l); if(p>=0) return p; }
+  return -1;
+}
+
+var S = {
+  mode: get("bh3.mode","corner"),
+  q: "",
+  fam: "all",
+  hidden: get("bh3.hide","0")==="1",
+  padOpen: get("bh3.pad", (window.innerWidth<760?"1":"0"))==="1",
+  shown: 60,
+  scheme: {corner:get("bh3.sc",""), edge:get("bh3.se","")},
+  arr: {corner:[], edge:[]}
+};
+if(S.mode!=="corner"&&S.mode!=="edge") S.mode="corner";
+["corner","edge"].forEach(function(k){
+  var v = normScheme(S.scheme[k]);
+  S.scheme[k] = validScheme(v) ? v : ABC;
+  S.arr[k] = Array.from(S.scheme[k]);
+});
+function setScheme(mode, str){
+  S.scheme[mode] = str;
+  S.arr[mode] = Array.from(str);
+  set(mode==="corner" ? "bh3.sc" : "bh3.se", str);
+}
+
+/* ---------- model ---------- */
+function buildModel(mode){
+  var src = D[mode], stk = src.stk, map = {};
+  for(var i=0;i<stk.length;i++) map[stk[i]] = i;
+  var by = {};
+  src.cases.forEach(function(c){ by[c.s.join(" ")] = c; });
+  return {stk:stk, map:map, cases:src.cases, by:by, buffer:map[src.buffer], used:{}};
+}
+var M = {corner:buildModel("corner"), edge:buildModel("edge")};
+["corner","edge"].forEach(function(mode){
+  M[mode].cases.forEach(function(c){ c.s.forEach(function(t){ M[mode].used[t]=1; }); });
+});
+
+function famOf(name){
+  var b = name.replace(/^Wide Setup into /i,"").replace(/^Setup into /i,"").replace(/^Wide /i,"").toLowerCase();
+  if(b.indexOf("direct insert")===0) return "di";
+  if(b.indexOf("drop and catch")===0) return "dc";
+  if(b.indexOf("a9")>=0) return "a9";
+  if(b.indexOf("b9")>=0) return "b9";
+  if(b.indexOf("orthogonal")>=0) return "orth";
+  if(b.indexOf("column")>=0) return "col";
+  if(b.indexOf("cyclic")>=0) return "cyc";
+  if(b.indexOf("special")>=0) return "ps";
+  if(b.indexOf("toss")>=0) return "toss";
+  if(b.indexOf("slice")>=0 || /^sp\d/.test(b)) return "sp";
+  return "other";
+}
+
+function rebuild(){
+  ["corner","edge"].forEach(function(mode){
+    var m = M[mode], arr = S.arr[mode];
+    m.cases.forEach(function(c){
+      c._c = [arr[m.map[c.s[0]]], arr[m.map[c.s[1]]], arr[m.map[c.s[2]]]];
+      c._l = c._c.join("");
+      c._k = c._c[1] + c._c[2];
+      var f = {}, ff = [];
+      c.algs.forEach(function(a){ var k = famOf(a.c); if(!f[k]){f[k]=1;ff.push(k);} });
+      c._f = ff;
+    });
+    m.cases.sort(function(a,b){ return a._k < b._k ? -1 : a._k > b._k ? 1 : 0; });
+  });
+}
+
+/* ---------- query ---------- */
+function queryInfo(){
+  var q = S.q, m = M[S.mode], arr = S.arr[S.mode], buf = m.buffer;
+  if(!q) return {k:"empty", filter:""};
+  var chars = Array.from(q), idx = [], i, ch, p;
+  for(i=0;i<chars.length;i++){
+    ch = chars[i];
+    p = findIdx(arr, ch);
+    if(p<0) return {k:"bad", ch:ch, filter:""};
+    idx.push(p);
+  }
+
+  /* 1 个编码：不构成循环，按前缀过滤 */
+  if(idx.length===1) return {k:"part", filter: idx[0]===buf ? "" : q};
+
+  /* 2 个编码：缓冲块可省略，自动补在首位 */
+  if(idx.length===2){
+    if(idx[0]===buf || idx[1]===buf){
+      var other = idx[0]===buf ? idx[1] : idx[0];
+      return {k:"part", filter: arr[other]};
+    }
+    if(idx[0]===idx[1]) return {k:"dup"};
+    var k2 = [buf, idx[0], idx[1]].map(function(x){return m.stk[x];}).join(" ");
+    var c2 = m.by[k2];
+    if(!c2) return {k:"miss"};
+    return {k:"ok", c:c2, filter: arr[idx[0]] + arr[idx[1]]};
+  }
+
+  /* 3 个编码：缓冲块可出现在任意位置，自动旋转到起点 */
+  if(idx[0]===idx[1]||idx[1]===idx[2]||idx[0]===idx[2]) return {k:"dup"};
+  var bp = idx.indexOf(buf);
+  if(bp<0) return {k:"nobuf"};
+  var rot = [idx[bp], idx[(bp+1)%3], idx[(bp+2)%3]];
+  var key = rot.map(function(x){return m.stk[x];}).join(" ");
+  var c = m.by[key];
+  if(!c) return {k:"miss"};
+  return {k:"ok", c:c, filter: arr[rot[1]] + arr[rot[2]]};
+}
+
+/* ---------- render: pad ---------- */
+function renderPad(){
+  var m = M[S.mode], arr = S.arr[S.mode], h = "";
+  for(var i=0;i<24;i++){
+    var t = m.stk[i], f = FACE[t.charAt(0)], ch = arr[i];
+    h += '<button data-ch="'+esc(ch)+'"'+(i===m.buffer?' class="bufb"':'')+'><span class="dotline"><i class="fd" style="background:var('+f+')"></i><b>'+esc(ch)+'</b></span><small>'+t+'</small></button>';
+  }
+  $("#pad").innerHTML = h;
+  $("#pad").hidden = !S.padOpen;
+  $("#btnPad").textContent = S.padOpen ? "收起" : "展开";
+}
+
+/* ---------- render: chips ---------- */
+function renderChips(){
+  var m = M[S.mode], cnt = {}, i, k;
+  m.cases.forEach(function(c){ c._f.forEach(function(f){ cnt[f]=(cnt[f]||0)+1; }); });
+  var order = ["di","dc","a9","b9","orth","col","cyc","ps","toss","sp","other"], h = "";
+  h += '<button class="chip'+(S.fam==="all"?" on":"")+'" data-f="all">全部<em>'+m.cases.length+'</em></button>';
+  for(i=0;i<order.length;i++){
+    k = order[i];
+    if(!cnt[k]) continue;
+    h += '<button class="chip'+(S.fam===k?" on":"")+'" data-f="'+k+'">'+FAM[k].label+'<em>'+cnt[k]+'</em></button>';
+  }
+  $("#chips").innerHTML = h;
+}
+
+/* ---------- render: detail ---------- */
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function renderDetail(info, focus){
+  var el = $("#detail"), col = $("#detailcol"), m = M[S.mode], arr = S.arr[S.mode], h = "";
+
+  if(info.k==="empty"||info.k==="part"){ el.innerHTML=""; el.hidden=true; col.hidden=true; return; }
+  el.hidden = false; col.hidden = false;
+
+  if(info.k==="bad"){
+    h = '<div class="msgcard">编码 <b class="kw">'+esc(info.ch)+'</b> 不在当前方案中。<br>当前'+ (S.mode==="corner"?"角块":"棱块") +'编码为：<b class="kw">'+esc(S.scheme[S.mode])+'</b>，可在设置里改为你自己的编码。</div>';
+  } else if(info.k==="dup"){
+    h = '<div class="msgcard">编码不能重复。一个三循环由 <b>三个不同的贴纸</b> 组成——输入完整三个，或省略缓冲块只写另外两个。</div>';
+  } else if(info.k==="nobuf"){
+    h = '<div class="msgcard">这三个编码都不含<b>缓冲块</b> <b class="kw">'+esc(arr[m.buffer])+'</b>（'+m.stk[m.buffer]+'）。<br>查询时只需输入除缓冲块外的<b>两个编码</b>，缓冲块默认视为 <b class="kw">'+esc(arr[m.buffer])+'</b>。</div>';
+  } else if(info.k==="miss"){
+    h = '<div class="msgcard">未收录该三循环的公式。请确认编码属于'+(S.mode==="corner"?"角块":"棱块")+'，或在设置中核对编码方案。</div>';
+  } else {
+    var c = info.c, algs = c.algs, first = algs[0], fam = famOf(first.c);
+    var cycle = "";
+    for(var i=0;i<3;i++){
+      var t = c.s[i], ch = arr[m.map[t]], fc = FACE[t.charAt(0)];
+      cycle += (i? '<span class="ar">→</span>':'') + '<span class="cwrap'+(i===0?' buf':'')+'"><b class="cl" style="--fc:var('+fc+')">'+esc(i===0?'('+ch+')':ch)+'</b><span class="ct">'+t+'</span></span>';
+    }
+    h += '<div class="card"><div class="chead">';
+    h += '<span class="badge '+FAM[fam].tag+'">'+esc(first.c)+'</span>';
+    h += '<span class="cmeta">'+(algs.length>1 ? algs.length+" 个公式" : first.n+" "+first.m)+'</span></div>';
+    h += '<div class="cycle">'+cycle+'</div>';
+    if(S.scheme[S.mode]!==ABC){
+      h += '<div class="note">Speffz：(' + ABC.charAt(m.map[c.s[0]]) + ') → ' + ABC.charAt(m.map[c.s[1]]) + ' → ' + ABC.charAt(m.map[c.s[2]]) + '</div>';
+    }
+    h += '<div class="hr"></div><div class="algs">';
+    for(var j=0;j<algs.length;j++){
+      var a = algs[j], txt = a.a;
+      h += '<div class="alg">';
+      if(algs.length>1){
+        h += '<div class="alghead"><span class="aname"><em>'+NUM[j]+'</em>'+esc(a.c)+'</span><span class="astep">'+a.n+' '+a.m+'</span></div>';
+      }
+      h += '<div class="algtext'+(S.hidden?' masked':'')+'">'+esc(txt)+'</div></div>';
+    }
+    h += '</div><div class="acts">';
+    h += '<button data-act="copy">复制公式</button>';
+    h += '<button data-act="rand">随机一例</button>';
+    h += '</div></div>';
+  }
+  el.innerHTML = h;
+  if(focus && window.innerWidth < 960){
+    var top = el.getBoundingClientRect().top + window.pageYOffset - 8;
+    window.scrollTo({top: top, behavior:"smooth"});
+  }
+}
+
+/* ---------- render: list ---------- */
+function filtered(prefix){
+  var m = M[S.mode], arr = m.cases;
+  if(S.fam!=="all") arr = arr.filter(function(c){ return c._f.indexOf(S.fam)>=0; });
+  if(prefix) arr = arr.filter(function(c){ return c._k.indexOf(prefix)===0; });
+  return arr;
+}
+
+function codeHTML(c){
+  var q = c._c;
+  return '<i class="bf">('+esc(q[0])+')</i><b>'+esc(q[1])+'</b><b>'+esc(q[2])+'</b>';
+}
+
+function renderList(info, reset){
+  var pf = info.filter || "";
+  /* 只输入了一个编码时，用卡片形式列出候选，便于直接辨认 */
+  var cards = info.k==="part" && pf.length>0;
+  S.isCards = cards;
+  if(reset) S.shown = cards ? 6 : 60;
+
+  var arr = filtered(pf), list = $("#list"), h = "", i, n = Math.min(arr.length, S.shown);
+  for(i=0;i<n;i++){
+    var c = arr[i], a = c.algs[0];
+    if(S.fam!=="all"){ for(var k=0;k<c.algs.length;k++){ if(famOf(c.algs[k].c)===S.fam){ a=c.algs[k]; break; } } }
+    if(cards){
+      h += '<button class="ccard" data-l="'+esc(c._l)+'"><span class="cc-top"><span class="cc-code">'+codeHTML(c)+'</span>'
+        + '<span class="badge '+FAM[famOf(a.c)].tag+'">'+esc(a.c)+(c.algs.length>1?' +'+(c.algs.length-1):'')+'</span></span>'
+        + '<span class="cc-alg">'+esc(a.a)+'</span></button>';
+    } else {
+      h += '<button class="row" data-l="'+esc(c._l)+'"><span class="rl">'+codeHTML(c)+'</span>'
+        + '<span class="badge '+FAM[famOf(a.c)].tag+'">'+esc(a.c)+(c.algs.length>1?' +'+(c.algs.length-1):'')+'</span>'
+        + '<span class="ra">'+esc(a.a)+'</span></button>';
+    }
+  }
+  list.className = cards ? "list cgrid" : "list";
+  list.innerHTML = h || '<div class="empty">没有匹配的公式</div>';
+  var more = $("#more");
+  more.hidden = arr.length<=S.shown;
+  if(!more.hidden) more.textContent = "显示更多"+(cards?"候选":"")+"（还有 "+(arr.length-S.shown)+" 个）";
+  $("#listCount").innerHTML = "<b>"+arr.length+"</b> 个"+(cards?"候选":"公式")+(pf?' · 前缀 <b>'+esc(Array.from(pf).join(" "))+'</b>':'');
+  $("#listHint").textContent = cards ? "点卡片查看详情" : (S.fam==="all" ? "" : "已按分类筛选");
+}
+
+/* ---------- update ---------- */
+function repaint(focus){
+  var info = queryInfo();
+  renderDetail(info, focus);
+  renderList(info, true);
+}
+function update(struct, focus){
+  if(struct){ renderPad(); renderChips(); }
+  $("#btnClear").hidden = !S.q;
+  repaint(focus);
+}
+
+/* ---------- events ---------- */
+var qEl = $("#q"), composing = false;
+function syncQuery(){
+  var v = Array.from(qEl.value).filter(function(c){ return !/\s/.test(c); }).slice(0,3).join("");
+  if(v!==qEl.value) qEl.value = v;
+  S.q = v;
+  update(false, false);
+}
+qEl.addEventListener("compositionstart", function(){ composing = true; });
+qEl.addEventListener("compositionend", function(){ composing = false; syncQuery(); });
+qEl.addEventListener("input", function(e){ if(composing || e.isComposing) return; syncQuery(); });
+qEl.addEventListener("keydown", function(e){ if(e.key==="Escape"){ qEl.value=""; S.q=""; update(false,false); qEl.blur(); } });
+
+$("#seg").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-mode]"); if(!b) return;
+  if(b.dataset.mode===S.mode) return;
+  S.mode = b.dataset.mode; set("bh3.mode", S.mode);
+  S.q = ""; qEl.value = ""; S.fam = "all";
+  [].forEach.call(this.querySelectorAll("button"), function(x){ x.classList.toggle("on", x===b); });
+  update(true, false);
+});
+
+$("#chips").addEventListener("click", function(e){
+  var b = e.target.closest(".chip"); if(!b) return;
+  S.fam = b.dataset.f;
+  renderChips(); repaint(false);
+});
+
+$("#pad").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-ch]"); if(!b) return;
+  if(S.q.length>=3) S.q = "";
+  S.q += b.dataset.ch;
+  qEl.value = S.q;
+  update(false, false);
+});
+
+$("#btnClear").addEventListener("click", function(){ S.q=""; qEl.value=""; update(false,false); qEl.focus(); });
+$("#btnRand").addEventListener("click", rand);
+
+function rand(){
+  var arr = M[S.mode].cases;
+  if(S.fam !== "all") arr = arr.filter(function(c){ return c._f.indexOf(S.fam)>=0; });
+  var c = arr[Math.floor(Math.random()*arr.length)];
+  S.q = c._l.slice(1); qEl.value = S.q;
+  update(false, true);
+}
+
+$("#btnPad").addEventListener("click", function(){
+  S.padOpen = !S.padOpen; set("bh3.pad", S.padOpen?"1":"0");
+  $("#pad").hidden = !S.padOpen;
+  $("#btnPad").textContent = S.padOpen ? "收起" : "展开";
+});
+
+$("#list").addEventListener("click", function(e){
+  var b = e.target.closest(".row, .ccard"); if(!b) return;
+  S.q = b.dataset.l; qEl.value = S.q;
+  update(false, true);
+});
+
+$("#more").addEventListener("click", function(){ S.shown += S.isCards ? 6 : 80; renderList(queryInfo(), false); });
+
+$("#detail").addEventListener("click", function(e){
+  var act = e.target.closest("[data-act]");
+  if(act){
+    var k = act.dataset.act;
+    if(k==="copy"){ var t = this.querySelector(".algtext"); if(t) copy(t.textContent.trim()); }
+    if(k==="rand"){ rand(); }
+    return;
+  }
+  var at = e.target.closest(".algtext");
+  if(at){
+    if(at.classList.contains("masked")){ at.classList.remove("masked"); return; }
+    copy(at.textContent.trim());
+  }
+});
+
+function copy(txt){
+  var done = function(){ toast("已复制："+txt.slice(0,26)+(txt.length>26?"…":"")); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, function(){ fallback(txt,done); });
+  } else fallback(txt,done);
+}
+function fallback(txt,cb){
+  var ta = document.createElement("textarea");
+  ta.value = txt; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); cb(); }catch(e){ toast("复制失败，请手动选择"); }
+  document.body.removeChild(ta);
+}
+var toastTimer;
+function toast(msg){
+  var t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1700);
+}
+
+/* ---------- settings ---------- */
+var modal = $("#modal");
+function openModal(){
+  $("#sc").value = S.scheme.corner;
+  $("#se").value = S.scheme.edge;
+  $("#swHide").checked = S.hidden;
+  drawGrid();
+  modal.hidden = false; document.body.classList.add("lock");
+}
+function closeModal(){ modal.hidden = true; document.body.classList.remove("lock"); }
+$("#btnSet").addEventListener("click", openModal);
+$("#btnClose").addEventListener("click", closeModal);
+modal.addEventListener("click", function(e){ if(e.target===modal) closeModal(); });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !modal.hidden) closeModal(); });
+
+function drawGrid(){
+  ["corner","edge"].forEach(function(mode){
+    var m = M[mode], arr = Array.from(normScheme((mode==="corner"?$("#sc"):$("#se")).value));
+    var pre = mode==="corner" ? "gc" : "ge";
+    for(var f=0;f<6;f++){
+      var box = $("#"+(f===0?pre:pre+(f+1))), h = "";
+      for(var i=f*4;i<f*4+4;i++){
+        var t = m.stk[i], ch = arr[i] || "–";
+        var cls = "cell";
+        if(arr.length===24 && arr.filter(function(x){return x===ch;}).length>1) cls += " dup";
+        if(!M[mode].used[t]) cls += " unused";
+        h += '<div class="'+cls+'"><b>'+esc(ch)+'</b><s>'+t+'</s><s style="opacity:.55">'+ABC.charAt(i)+'</s></div>';
+      }
+      box.innerHTML = h;
+    }
+  });
+}
+["#sc","#se"].forEach(function(sel){
+  var el = $(sel), comp = false;
+  function apply(){
+    var v = normScheme(el.value);
+    if(v!==el.value) el.value = v;
+    var ok = validScheme(v), sc = el.id==="sc" ? "corner" : "edge";
+    $("#warn").classList.toggle("show", !ok && v.length>0);
+    if(ok){
+      el.classList.remove("bad");
+      if(S.scheme[sc]!==v){
+        setScheme(sc, v);
+        S.q = ""; qEl.value = "";
+        rebuild(); update(true, false);
+      }
+    } else el.classList.add("bad");
+    drawGrid();
+  }
+  el.addEventListener("compositionstart", function(){ comp = true; });
+  el.addEventListener("compositionend", function(){ comp = false; apply(); });
+  el.addEventListener("input", function(e){ if(comp || e.isComposing) return; apply(); });
+});
+$("#btnReset").addEventListener("click", function(){
+  setScheme("corner", ABC); setScheme("edge", ABC);
+  $("#sc").value = ABC; $("#se").value = ABC;
+  $("#warn").classList.remove("show");
+  $("#sc").classList.remove("bad"); $("#se").classList.remove("bad");
+  S.q=""; qEl.value="";
+  rebuild(); drawGrid(); update(true,false);
+});
+$("#swHide").addEventListener("change", function(){
+  S.hidden = this.checked; set("bh3.hide", S.hidden?"1":"0"); renderDetail(queryInfo(), false);
+});
+
+/* ---------- legend ---------- */
+(function(){
+  var k = ["di","dc","a9","b9","orth","col","cyc","ps","toss","sp"], h = "";
+  for(var i=0;i<k.length;i++) h += '<span class="badge '+FAM[k[i]].tag+'">'+FAM[k[i]].label+'</span>';
+  $("#legend").innerHTML = h;
+})();
+
+/* ---------- scroll top ---------- */
+window.addEventListener("scroll", function(){
+  $("#totop").classList.toggle("show", window.scrollY>600);
+}, {passive:true});
+$("#totop").addEventListener("click", function(){ window.scrollTo({top:0,behavior:"smooth"}); });
+
+/* ---------- boot ---------- */
+[].forEach.call($("#seg").querySelectorAll("button"), function(x){ x.classList.toggle("on", x.dataset.mode===S.mode); });
+rebuild();
+update(true, false);
+})();
+</script>
+</body>
+</html>

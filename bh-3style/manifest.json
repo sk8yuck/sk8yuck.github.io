@@ -1,0 +1,18 @@
+{
+  "name": "BH 3-Style 公式手册",
+  "short_name": "BH 3-Style",
+  "description": "Beyer-Hardwick 盲拧三循环公式查询手册：角块 378 例、棱块 440 例，支持自定义编码。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f5f7",
+  "theme_color": "#f4f5f7",
+  "categories": ["education", "reference", "utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
